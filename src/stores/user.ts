@@ -4,6 +4,7 @@ import Login from "@/api/system/auth.ts";
 import type {loginRequest} from "@/types/system/auth.ts";
 import {getCurrentUser} from "@/api/system/user.ts";
 import type {UserInfo} from "@/types/system/user.ts";
+import {usePermissionStore} from "@/stores/permission.ts";
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -28,6 +29,8 @@ export const useUserStore = defineStore('user', {
     logout() {
       removeToken()
       this.token = null
+      const permissionStore=usePermissionStore()
+      permissionStore.routesLoaded=false
     },
     async getUserInfo() {
       try {

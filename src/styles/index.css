@@ -5,13 +5,42 @@
 }
 
 :root {
-  --color-primary: #0070f3;
+  /* 主题色（若依 / 主流 ERP 风格蓝） */
+  --color-primary: #1890ff;
+  /* 布局尺寸 */
   --aside-width: 200px;
-  --header-height: 60px;
+  --header-height: 50px;
+
+  /* 覆盖 Element Plus 主题色 */
+  --el-color-primary: #1890ff;
+  --el-color-primary-light-3: #5db1ff;
+  --el-color-primary-light-5: #8cc8ff;
+  --el-color-primary-light-7: #badeff;
+  --el-color-primary-light-8: #d1e9ff;
+  --el-color-primary-light-9: #e8f4ff;
+  --el-color-primary-dark-2: #1373cc;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial,
+    sans-serif;
+  font-size: 14px;
+  color: #303133;
+  background-color: #f0f2f5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .round {
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 .center {
@@ -20,4 +49,21 @@
   align-items: center;
 }
 
+/* 精简滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
+::-webkit-scrollbar-thumb {
+  background: #c0c4cc;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #909399;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

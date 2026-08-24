@@ -34,5 +34,36 @@
 </template>
 
 <style scoped>
+  .el-scrollbar {
+    height: 100%;
+    background-color: #304156;
+  }
 
+  :deep(.el-menu) {
+    border-right: none;
+    background-color: #304156;
+  }
+
+  :deep(.el-menu-item),
+  :deep(.el-sub-menu__title) {
+    height: 50px;
+    line-height: 50px;
+    color: #bfcbd9;
+  }
+
+  :deep(.el-menu-item:hover),
+  :deep(.el-sub-menu__title:hover) {
+    background-color: #263445;
+    color: #ffffff;
+  }
+
+  :deep(.el-menu-item.is-active),
+  :deep(.el-menu-item.is-active:hover) {
+    background-color: var(--el-color-primary);
+    color: #ffffff;
+  }
+
+  :deep(.el-sub-menu .el-menu) {
+    background-color: #1f2d3d;
+  }
 </style>

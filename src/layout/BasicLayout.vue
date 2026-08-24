@@ -21,32 +21,37 @@
   .basic-layout {
     width: 100vw;
     height: 100vh;
-    padding: 10px;
+    padding: 8px;
     display: grid;
     grid-template-columns: var(--aside-width) 1fr;
     grid-template-rows: var(--header-height) 1fr;
     grid-template-areas:
       "aside header"
       "aside main";
-    gap: 15px;
+    gap: 8px;
 
     .header {
       grid-area: header;
-      background-color: aqua;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e4e7ed;
       width: 100%;
       height: 100%;
+      padding: 0 16px;
+      line-height: var(--header-height);
     }
 
     .aside {
       grid-area: aside;
-      background: #0070f3;
+      background: #304156;
       width: 100%;
       height: 100%;
+      overflow: hidden;
     }
 
     .main {
       grid-area: main;
-      background-color: #f5f5f5;
+      padding: 10px;
+      background-color: #f0f2f5;
       width: 100%;
       height: 100%;
     }
