@@ -2,11 +2,13 @@
   import {reactive, ref} from "vue"
   import {useRouter} from "vue-router"
   import {useUserStore} from "@/stores/user.ts"
+  import {usePermissionStore} from "@/stores/permission.ts"
   import {User, Lock} from "@element-plus/icons-vue"
   import {ElMessage, type FormInstance} from "element-plus"
 
   const router = useRouter()
   const useStore = useUserStore()
+  const permissionStore = usePermissionStore()
   const formRef = ref<FormInstance>()
   const loading = ref(false)
 
@@ -33,6 +35,7 @@
         loading.value = true
         await useStore.login(form)
         await useStore.getUserInfo()
+        await permissionStore.menuLoad()
         ElMessage.success({
           message: '登录成功',
           type: 'success'

@@ -1,6 +1,20 @@
 import type {RouteRecordRaw} from 'vue-router'
+import type {MenuItem} from '@/types/system/menu.ts'
 
-const routes:RouteRecordRaw[] = [
+const module = import.meta.glob('../views/**/*.vue')
+
+export function generateRoutes(menus: MenuItem[]): RouteRecordRaw[] {
+  return menus.map(menu => {
+    return {
+      path: menu.path,
+      name: menu.name,
+      component: module[`../views/${menu.component}.vue`],
+      children: menu.children ? generateRoutes(menu.children) : []
+    }
+  })
+}
+
+const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
@@ -8,8 +22,15 @@ const routes:RouteRecordRaw[] = [
   },
   {
     path: '/',
-    name: 'home',
-    component: () => import('@/views/home/home.vue')
+    name: 'BasicLayout',
+    component: () => import('@/layout/BasicLayout.vue'),
+    redirect: '/home',
+    children: []
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: '404',
+    component: () => import('@/views/404.vue')
   }
 ]
 
