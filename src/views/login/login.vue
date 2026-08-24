@@ -25,13 +25,14 @@
   })
 
   const handleLogin = () => {
-    formRef.value?.validate((valid) => {
+    formRef.value?.validate(async (valid) => {
       if (!valid) {
         return
       }
       try {
         loading.value = true
-        useStore.login(form)
+        await useStore.login(form)
+        await useStore.getUserInfo()
         ElMessage.success({
           message: '登录成功',
           type: 'success'
