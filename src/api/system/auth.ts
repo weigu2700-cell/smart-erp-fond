@@ -1,6 +1,5 @@
-import request from '@/utils/request'
+import service from '@/utils/request'
 import type {loginRequest,loginResponse} from "@/types/system/auth.ts";
-import service from "@/utils/request";
 
 function Login(
   data: loginRequest

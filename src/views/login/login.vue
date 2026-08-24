@@ -36,7 +36,6 @@
           message: '登录成功',
           type: 'success'
         })
-        // router.push({name: 'home'})
       } catch (e) {
         ElMessage.error(
           {

@@ -9,10 +9,11 @@ import { getToken, removeToken } from '@/utils/auth'
 
 const http:AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 10_000,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }
+
 })
 
 http.interceptors.request.use(
@@ -74,46 +75,34 @@ function request(
   return http.request(config)
 }
 
-
 export function get<T>(
   url:string,
   config?:AxiosRequestConfig
 ):Promise<T>{
-
   return request<T>({ ...config, method: 'GET', url })
-
 }
-
 
 export function post<T>(
   url:string,
   data?:unknown,
   config?:AxiosRequestConfig
 ):Promise<T>{
-
   return request<T>({ ...config, method: 'POST', url, data })
-
 }
-
 
 export function put<T>(
   url:string,
   data?:unknown,
   config?:AxiosRequestConfig
 ):Promise<T>{
-
   return request<T>({ ...config, method: 'PUT', url, data })
-
 }
-
 
 export function del<T>(
   url:string,
   config?:AxiosRequestConfig
 ):Promise<T>{
-
   return request<T>({ ...config, method: 'DELETE', url })
-
 }
 
 const service = {
