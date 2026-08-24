@@ -9,6 +9,7 @@ export function generateRoutes(menus: MenuItem[]): RouteRecordRaw[] {
       path: menu.path,
       name: menu.name,
       component: module[`../views/${menu.component}.vue`],
+      meta: {title: menu.title},
       children: menu.children ? generateRoutes(menu.children) : []
     }
   })
@@ -25,7 +26,14 @@ const routes: RouteRecordRaw[] = [
     name: 'BasicLayout',
     component: () => import('@/layout/BasicLayout.vue'),
     redirect: '/home',
-    children: []
+    children: [
+      {
+        path: 'home',
+        name: 'home',
+        component: () => import('@/views/home/home.vue'),
+        meta: {title: '首页'}
+      }
+    ]
   },
   {
     path: '/:pathMatch(.*)*',
