@@ -17,18 +17,18 @@ export interface MenuListRequest {
   pageSize: number
   title: string | null
   name: string | null
-  parentId: number | null
+  parentId: string | number | null
   visible: number | null
   status: MenuStatus | null
 }
 
 // 菜单列表项（MenuListVO）
 export interface MenuListVO {
-  id: number
+  id: string
   name: string
   title: string
   path: string
-  parentId: number | null
+  parentId: string | null
   parentName: string | null
   component: string
   icon: string
@@ -51,24 +51,24 @@ export interface MenuCreateRequest {
   path: string
   component: string
   icon: string | null
-  parentId: number | null
+  parentId: string | number | null
   visible: number
   status: MenuStatus
 }
 
 // 保存表单（编辑时携带 id）
 export interface MenuSaveRequest extends MenuCreateRequest {
-  id?: number
+  id?: string | number
 }
 
 // 菜单树节点（MenuTreeVO，用于父级菜单参照选择）
 export interface MenuTreeNode {
-  id: number
+  id: string
   name: string
   title: string
   path: string
   component: string
   icon?: string
-  parentId?: number | null
+  parentId?: string | null
   children?: MenuTreeNode[]
 }

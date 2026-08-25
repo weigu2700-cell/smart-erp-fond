@@ -9,7 +9,7 @@
 
   const emit = defineEmits<{
     (e: 'update:visible', visible: boolean): void
-    (e: 'select', menu: {id: number, title: string}): void
+    (e: 'select', menu: {id: string, title: string}): void
   }>()
 
   const columns: SelectorColumn<MenuTreeNode>[] = [
@@ -30,7 +30,7 @@
       pageSize: params.pageSize,
       title: null,
       name: null,
-      parentId: params.parentId == null ? null : Number(params.parentId),
+      parentId: params.parentId,
       visible: null,
       status: null,
     })

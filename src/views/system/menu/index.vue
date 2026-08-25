@@ -86,7 +86,8 @@
   // 点击左侧菜单树，按 parentId 过滤右侧列表
   const handleTreeClick = (node: MenuTreeNode | {id: string}) => {
     const id = (node as {id: string}).id
-    queryData.parentId = id === '__all__' ? null : Number(id)
+    // id 是雪花 Long 字符串，直接传字符串避免 Number 精度丢失
+    queryData.parentId = id === '__all__' ? null : id
     queryData.page = 1
     handleQuery(queryData)
   }

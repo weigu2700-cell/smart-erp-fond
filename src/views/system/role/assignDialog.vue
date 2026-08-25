@@ -4,9 +4,9 @@
   import type {ElTree} from "element-plus";
   import type {RoleInfo} from "@/types/system/role.ts";
   import type {PermissionNode} from "@/types/system/permission.ts";
-  import type {MenuItem} from "@/types/system/menu.ts";
+  import type {MenuTreeNode, MenuListVO} from "@/types/system/menu.ts";
   import {getPermissionTree} from "@/api/system/permission.ts";
-  import {getMenuTree} from "@/api/system/menu.ts";
+  import {getMenuTree, getMenuList} from "@/api/system/menu.ts";
   import {assignRolePermissions, assignRoleMenus, getRoleDetail} from "@/api/system/role.ts";
 
   const props = defineProps<{
@@ -22,21 +22,61 @@
   const permissionTreeRef = ref<InstanceType<typeof ElTree>>()
   const menuTreeRef = ref<InstanceType<typeof ElTree>>()
   const permissionTree = ref<PermissionNode[]>([])
-  const menuTree = ref<MenuItem[]>([])
+  const menuTree = ref<MenuTreeNode[]>([])
   const saving = ref(false)
   const loading = ref(false)
 
-  // 递归收集树节点 id
-  const collectIds = (nodes: {id: string | number, children?: any[]}[]): number[] => {
-    const ids: number[] = []
+  // 递归收集树节点 id（后端 Long 序列化为 string，统一转 string 避免精度丢失）
+  const collectIds = (nodes: {id: string | number, children?: any[]}[]): string[] => {
+    const ids: string[] = []
     const walk = (list: any[]) => {
       list.forEach(n => {
-        ids.push(Number(n.id))
+        ids.push(String(n.id))
         if (n.children?.length) walk(n.children)
       })
     }
     walk(nodes)
     return ids
+  }
+
+  // 分页循环拉取全部菜单（菜单量小，一次取完），并按 parentId 组装成树
+  const fetchAllMenus = async (): Promise<MenuTreeNode[]> => {
+    const all: MenuListVO[] = []
+    const pageSize = 100
+    let page = 1
+    for (;;) {
+      const res = await getMenuList({
+        page,
+        pageSize,
+        title: null,
+        name: null,
+        parentId: null,
+        visible: null,
+        status: null,
+      })
+      all.push(...res.records)
+      if (all.length >= res.total || res.records.length === 0) break
+      page += 1
+    }
+    // id/parentId 均为字符串（雪花 Long 序列化），用 String 归一化保证匹配
+    const map = new Map<string, MenuTreeNode>()
+    all.forEach(m => map.set(String(m.id), {
+      id: String(m.id),
+      name: m.name,
+      title: m.title,
+      path: m.path,
+      component: m.component,
+      icon: m.icon,
+      parentId: m.parentId,
+      children: [],
+    }))
+    const roots: MenuTreeNode[] = []
+    map.forEach(n => {
+      const parent = n.parentId != null ? map.get(String(n.parentId)) : undefined
+      if (parent) parent.children?.push(n)
+      else roots.push(n)
+    })
+    return roots
   }
 
   const loadPermissionTree = async () => {
@@ -54,10 +94,12 @@
   const loadMenuTree = async () => {
     if (!props.row) return
     try {
-      menuTree.value = await getMenuTree(props.row.id)
+      // 数据源：全部菜单树（可勾选任意菜单）
+      menuTree.value = await fetchAllMenus()
+      // 回显：该角色已分配的菜单树（GET /system/menu/tree?dto.roleId=xx）
+      const assigned = await getMenuTree(props.row.id)
       await nextTick()
-      // 后端按 roleId 返回该角色已分配的菜单树，全勾回显
-      menuTreeRef.value?.setCheckedKeys(collectIds(menuTree.value))
+      menuTreeRef.value?.setCheckedKeys(collectIds(assigned))
     } catch {
       // 错误信息已由请求拦截器统一提示
     }
@@ -96,7 +138,7 @@
         await assignRolePermissions({roleId: props.row.id, permissionIds: keys as number[]})
         ElMessage.success('权限分配成功')
       } else {
-        await assignRoleMenus({roleId: props.row.id, menuIds: keys as number[]})
+        await assignRoleMenus({roleId: props.row.id, menuIds: keys})
         ElMessage.success('菜单分配成功')
       }
       emit('success')

@@ -51,7 +51,7 @@
     parentSelectorVisible.value = true
   }
 
-  const handleParentSelect = (menu: {id: number, title: string}) => {
+  const handleParentSelect = (menu: {id: string, title: string}) => {
     form.parentId = menu.id
     parentName.value = menu.title
   }

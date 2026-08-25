@@ -48,5 +48,5 @@ export interface RolePermissionAssignRequest {
 // 分配菜单参数（RoleMenuAssignDTO）
 export interface RoleMenuAssignRequest {
   roleId: string
-  menuIds: number[]
+  menuIds: (string | number)[]
 }

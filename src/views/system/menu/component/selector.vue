@@ -39,7 +39,7 @@
     queryData.parentName = null
   }
 
-  const handleParentSelect = (menu: {id: number, title: string}) => {
+  const handleParentSelect = (menu: {id: string, title: string}) => {
     queryData.parentId = menu.id
     queryData.parentName = menu.title
     parentSelectorVisible.value = false
@@ -97,10 +97,7 @@
 </template>
 
 <style scoped>
-  .menu-selector {
-
-    .field-icon {
-      cursor: pointer;
-    }
+  .menu-selector .field-icon {
+    cursor: pointer;
   }
 </style>
