@@ -1,0 +1,52 @@
+export type RoleStatus = 'ENABLE' | 'DISABLE'
+
+// 列表记录 / 详情（RoleInfoVO）
+export interface RoleInfo {
+  id: string
+  name: string
+  code: string
+  sort: number
+  status: RoleStatus
+  permissionIds: number[]
+}
+
+// 分页查询参数（RoleGetDTO）
+export interface RoleListRequest {
+  page: number
+  pageSize: number
+  name?: string | null
+  code?: string | null
+  sort?: number | null
+  status?: RoleStatus | null
+}
+
+// 分页列表响应（PageRoleInfoVO）
+export interface RoleListResponse {
+  records: RoleInfo[]
+  total: number
+  size: number
+  current: number
+}
+
+export type RoleDetailResponse = RoleInfo
+
+// 新增/更新参数（RoleUpdateDTO），id 用于更新
+export interface RoleSaveRequest {
+  id?: string
+  name: string
+  code: string
+  status: RoleStatus
+  permissionCode?: string[]
+}
+
+// 分配权限参数（RolePermissionAssignDTO）
+export interface RolePermissionAssignRequest {
+  roleId: string
+  permissionIds: number[]
+}
+
+// 分配菜单参数（RoleMenuAssignDTO）
+export interface RoleMenuAssignRequest {
+  roleId: string
+  menuIds: number[]
+}

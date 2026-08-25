@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T extends object">
   import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+  import ProPagination from "@/components/ProPagination.vue";
 
   export interface ProColumn {
     label: string
@@ -31,8 +32,6 @@
     (e: 'selectionChange', rows: T[]): void
   }>()
 
-  const handlePageChange = (page: number) => emit('update:page', page)
-  const handleSizeChange = (size: number) => emit('update:pageSize', size)
   const handleSelectionChange = (rows: T[]) => emit('selectionChange', rows)
 
   // 把最后一列转为弹性列（min-width），吃掉剩余空间使表格撑满
@@ -96,19 +95,14 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="pro-pagination round" style="border: 2px solid red; position: relative; z-index: 9999">
-      <span style="color: red; white-space: nowrap">DEBUG total={{ props.total }} page={{ props.page }}</span>
-      <el-pagination
-        background
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="props.total"
-        :current-page="props.page"
-        :page-size="props.pageSize"
-        :page-sizes="props.pageSizes"
-        @current-change="handlePageChange"
-        @size-change="handleSizeChange"
-      />
-    </div>
+    <ProPagination
+      :total="props.total"
+      :page="props.page"
+      :page-size="props.pageSize"
+      :page-sizes="props.pageSizes"
+      @update:page="(p: number) => emit('update:page', p)"
+      @update:pageSize="(s: number) => emit('update:pageSize', s)"
+    />
   </div>
 </template>
 
@@ -121,17 +115,8 @@
     gap: 10px;
 
     .pro-table {
+      flex: 1;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    }
-    .pro-pagination {
-      flex-shrink: 0;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      gap: 10px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-      background: #ffffff;
     }
   }
 </style>

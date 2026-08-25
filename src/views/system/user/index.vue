@@ -183,7 +183,6 @@
 
     .selector {
       width: 100%;
-      min-height: 100px;
       background: #ffffff;
       border: 1px solid #e4e7ed;
     }

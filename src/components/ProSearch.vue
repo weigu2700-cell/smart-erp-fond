@@ -24,6 +24,7 @@
 
 <style scoped>
   .pro-search {
+    height: 100%;
     width: 100%;
     padding: 12px 16px;
     display: flex;
