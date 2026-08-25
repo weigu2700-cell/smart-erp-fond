@@ -5,7 +5,8 @@ import type {
   getUserListRequest,
   getUserListResponse,
   updateUserRequest,
-  UserInfo
+  UserInfo,
+  UserRoleAssignRequest
 } from "@/types/system/user.ts";
 
 export function getCurrentUser() {
@@ -26,5 +27,13 @@ export function getUserDetail(id: string) {
 
 export function updateUser(data: updateUserRequest) {
   return service.put(`system/user/${data.id}`, data)
+}
+
+// 分配角色（UserRoleAssignDTO，userId 按 int64 传 number）
+export function assignUserRoles(data: UserRoleAssignRequest) {
+  return service.post(`system/user/${data.userId}/roles`, {
+    userId: Number(data.userId),
+    roleIds: data.roleIds,
+  })
 }
 

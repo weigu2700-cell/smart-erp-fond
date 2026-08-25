@@ -11,6 +11,7 @@
   } from "@/api/system/user.ts";
   import ProToolbar from "@/components/ProToolbar.vue";
   import SaveDialog from "@/views/system/user/saveDialog.vue";
+  import AssignDialog from "@/views/system/user/assignDialog.vue";
   import Selector from "@/views/system/user/component/selector.vue";
   import type {createUserRequest, updateUserRequest} from "@/types/system/user.ts";
 
@@ -19,6 +20,9 @@
   const dialogVisible = ref(false)
   const editRow = ref<createUserRequest & {id?: string, deptName?: string} | null>(null)
   const selectedData = ref<getUserListResponse['records']>([])
+  const assignMode = ref<'role' | 'dept'>('role')
+  const assignVisible = ref(false)
+  const assignRow = ref<{id: string, username: string, realName?: string} | null>(null)
   const queryData = reactive<{
     page: number
     pageSize: number
@@ -47,8 +51,13 @@
   const handleQuery = async (queryData : getUserListRequest) => {
     try {
       tableData.value = await getUserList(queryData)
-      console.log(tableData.value)
     }catch {}
+  }
+
+  const openAssignDialog = (row: getUserListResponse['records'][number], mode: 'role' | 'dept') => {
+    assignMode.value = mode
+    assignRow.value = {id: row.id, username: row.username, realName: row.realName}
+    assignVisible.value = true
   }
 
   const handleSelectorQuery = (params: Omit<getUserListRequest, 'page' | 'pageSize'>) => {
@@ -156,9 +165,9 @@
             size="small"
           >{{ role.roleName }}</el-tag>
         </template>
-        <template #actions>
-          <el-button type="text">分配角色</el-button>
-          <el-button type="text">分配部门</el-button>
+        <template #actions="{row}">
+          <el-button type="text" @click="openAssignDialog(row, 'role')">分配角色</el-button>
+          <el-button type="text" @click="openAssignDialog(row, 'dept')">分配部门</el-button>
         </template>
       </ProTable>
     </div>
@@ -170,6 +179,14 @@
     :row="editRow"
     @submit="handleSubmit"
     @cancel="handleCancel"
+  />
+
+  <AssignDialog
+    :visible="assignVisible"
+    :mode="assignMode"
+    :row="assignRow"
+    @success="handleQuery(queryData)"
+    @cancel="assignVisible = false"
   />
 </template>
 

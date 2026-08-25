@@ -6,12 +6,6 @@ export interface UserInfo {
   deptName?: string
 }
 
-export interface UserRole {
-  roleId?: string
-  roleName?: string
-  roleKey?: string
-}
-
 export interface getUserListRequest {
   page: number
   pageSize: number
@@ -68,4 +62,10 @@ export interface updateUserRequest {
   deptId?: string | null
   roleIds?: string[] | null
   status?: number | null
+}
+
+// 分配角色参数（UserRoleAssignDTO，roleIds 为 int64）
+export interface UserRoleAssignRequest {
+  userId: string
+  roleIds: number[]
 }
