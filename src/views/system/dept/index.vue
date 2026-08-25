@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import {onMounted, reactive, ref} from "vue"
-import {ElMessage} from "element-plus";
-import type {deptResponse, deptRequest, deptColumns, saveDeptRequest} from "@/types/system/dept.ts";
-import {getDeptList, saveDept, updateDept} from "@/api/system/dept.ts";
-import SaveDialog from "@/views/system/dept/saveDialog.vue";
-import Selector from "@/views/system/dept/component/selector.vue";
-import ProTable from "@/components/ProTable.vue";
-import ProToolbar from "@/components/ProToolbar.vue";
-
+  import {onMounted, reactive, ref} from "vue"
+  import {ElMessage} from "element-plus";
+  import type {deptResponse, deptRequest, deptColumns, saveDeptRequest, deptTree} from "@/types/system/dept.ts";
+  import {getDeptList, getDeptTree, saveDept, updateDept} from "@/api/system/dept.ts";
+  import SaveDialog from "@/views/system/dept/saveDialog.vue";
+  import Selector from "@/views/system/dept/component/selector.vue";
+  import ProTable from "@/components/ProTable.vue";
+  import ProToolbar from "@/components/ProToolbar.vue";
+  import ProTree from "@/components/ProTree.vue";
 
   const tableData = ref<deptResponse>()
   const selectedData = ref<deptResponse['records']>([])
   const dialogVisible = ref(false)
   const dialogMode = ref<'add' | 'edit'>('add')
   const editRow = ref<saveDeptRequest & {parentName?: string} | null>(null)
+  const treeData = ref<deptTree[]>([])
   const queryData = reactive<deptRequest>({
     page: 1,
     pageSize: 10,
@@ -24,15 +25,30 @@ import ProToolbar from "@/components/ProToolbar.vue";
     sort: null
   })
 
-const columns:deptColumns[] = [
-  { label: '部门名称', prop: 'name', width: 240, sortable: true, fixed: 'left' },
-  { label: '部门编码', prop: 'code', width: 240, sortable: true, fixed: 'left' },
-  { label: '上级部门', prop: 'parentName', width: 240, sortable: true, fixed: 'left' },
-  { label: '创建时间', prop: 'createTime', width: 200, sortable: true, fixed: 'left' },
-]
+  const columns: deptColumns[] = [
+    { label: '部门名称', prop: 'name', width: 240, sortable: true, fixed: 'left' },
+    { label: '部门编码', prop: 'code', width: 240, sortable: true, fixed: 'left' },
+    { label: '上级部门', prop: 'parentName', width: 240, sortable: true, fixed: 'left' },
+    { label: '创建时间', prop: 'createTime', width: 200, sortable: true, fixed: 'left' },
+  ]
 
   const handleQuery = async (queryData: deptRequest) => {
     tableData.value = await getDeptList(queryData)
+  }
+
+  const loadTree = async () => {
+    try {
+      treeData.value = await getDeptTree()
+    } catch {
+      // 错误信息已由请求拦截器统一提示
+    }
+  }
+
+  // 点击左侧部门树，按 parentId 过滤右侧列表
+  const handleTreeClick = (node: deptTree | {id: string}) => {
+    queryData.parentId = (node as {id: string}).id === '__all__' ? null : (node as {id: string}).id
+    queryData.page = 1
+    handleQuery(queryData)
   }
 
   const handleSelectorQuery = (params: Omit<deptRequest, 'page' | 'pageSize'>) => {
@@ -103,35 +119,41 @@ const columns:deptColumns[] = [
 
   onMounted(() => {
     handleQuery(queryData)
+    loadTree()
   })
-
-
 </script>
 
 <template>
   <div class="dept-container">
-    <div class="selector round">
-      <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar
-        @add="handleAdd"
-        @edit="handleEdit"
-        @delete="handleDelete"
-        @refresh="handleQuery(queryData)"
-      />
-    </div>
-    <div class="table round">
-      <ProTable
-        :data="tableData?.records ?? []"
-        :columns="columns"
-        :total="tableData?.total ?? 0"
-        :page="queryData.page"
-        :page-size="queryData.pageSize"
-        @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
-        @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
-        @selectionChange="(rows) => selectedData = rows as deptResponse['records']"
-      />
+    <div class="page-body">
+      <div class="tree round">
+        <ProTree :data="treeData" show-root @node-click="handleTreeClick" />
+      </div>
+      <div class="content">
+        <div class="selector round">
+          <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+        </div>
+        <div class="toolbar round">
+          <ProToolbar
+            @add="handleAdd"
+            @edit="handleEdit"
+            @delete="handleDelete"
+            @refresh="handleQuery(queryData)"
+          />
+        </div>
+        <div class="table round">
+          <ProTable
+            :data="tableData?.records ?? []"
+            :columns="columns"
+            :total="tableData?.total ?? 0"
+            :page="queryData.page"
+            :page-size="queryData.pageSize"
+            @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
+            @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
+            @selectionChange="(rows) => selectedData = rows as deptResponse['records']"
+          />
+        </div>
+      </div>
     </div>
     <SaveDialog
       :visible="dialogVisible"
@@ -150,8 +172,30 @@ const columns:deptColumns[] = [
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     gap: 10px;
+
+    .page-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      gap: 10px;
+
+      .tree {
+        width: 240px;
+        flex: 0 0 240px;
+        background: #ffffff;
+        border: 1px solid #e4e7ed;
+        overflow: hidden;
+      }
+
+      .content {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
 
     .selector {
       width: 100%;
@@ -161,7 +205,8 @@ const columns:deptColumns[] = [
 
     .table {
       width: 100%;
-      height: calc(100% - 100px);
+      flex: 1;
+      min-height: 0;
     }
   }
 </style>

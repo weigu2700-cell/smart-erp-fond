@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import TreeTableSelector, {type SelectorColumn} from "@/selector/TreeTableSelector.vue"
   import type {MenuTreeNode} from "@/types/system/menu.ts"
-  import {getMenuList, getMenuTree} from "@/api/system/menu.ts"
+  import {getMenuList, getCurrentUserMenu} from "@/api/system/menu.ts"
 
   const props = defineProps<{
     visible: boolean
@@ -18,9 +18,9 @@
     {label: '路由路径', prop: 'path', minWidth: 140},
   ]
 
-  // 父级菜单树（不传 roleId 返回完整菜单树）
+  // 父级菜单树：/system/menu/tree 需按 roleId 查询（无参返回空），改用当前用户菜单树
   const loadTree = async (): Promise<MenuTreeNode[]> => {
-    const tree = await getMenuTree()
+    const tree = await getCurrentUserMenu()
     return tree as unknown as MenuTreeNode[]
   }
 

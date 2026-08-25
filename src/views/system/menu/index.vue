@@ -3,10 +3,12 @@
   import {ElMessage, ElMessageBox} from "element-plus";
   import ProToolbar from "@/components/ProToolbar.vue";
   import ProTable, {type ProColumn} from "@/components/ProTable.vue";
+  import ProTree from "@/components/ProTree.vue";
   import Selector from "@/views/system/menu/component/selector.vue";
   import SaveDialog from "@/views/system/menu/saveDialog.vue";
   import {
     getMenuList,
+    getCurrentUserMenu,
     createMenu,
     updateMenu,
     deleteMenu
@@ -15,7 +17,8 @@
     MenuListRequest,
     MenuListResponse,
     MenuListVO,
-    MenuSaveRequest
+    MenuSaveRequest,
+    MenuTreeNode
   } from "@/types/system/menu.ts";
 
   type EditRow = MenuSaveRequest & {parentName?: string}
@@ -25,6 +28,7 @@
   const dialogVisible = ref(false)
   const editRow = ref<EditRow | null>(null)
   const selectedData = ref<MenuListResponse['records']>([])
+  const treeData = ref<MenuTreeNode[]>([])
   const queryData = reactive<MenuListRequest>({
     page: 1,
     pageSize: 10,
@@ -64,6 +68,24 @@
     queryData.parentId = null
     queryData.visible = null
     queryData.status = null
+    queryData.page = 1
+    handleQuery(queryData)
+  }
+
+  // /system/menu/tree 需按 roleId 查询（无参返回空），左侧树使用当前用户菜单树
+  const loadTree = async () => {
+    try {
+      const tree = await getCurrentUserMenu()
+      treeData.value = tree as unknown as MenuTreeNode[]
+    } catch {
+      // 错误信息已由请求拦截器统一提示
+    }
+  }
+
+  // 点击左侧菜单树，按 parentId 过滤右侧列表
+  const handleTreeClick = (node: MenuTreeNode | {id: string}) => {
+    const id = (node as {id: string}).id
+    queryData.parentId = id === '__all__' ? null : Number(id)
     queryData.page = 1
     handleQuery(queryData)
   }
@@ -120,21 +142,6 @@
     }
   }
 
-  const handleDeleteRow = async (row: MenuListVO) => {
-    try {
-      await ElMessageBox.confirm(
-        `确定删除菜单「${row.title}」吗？`,
-        '提示',
-        {type: 'warning', confirmButtonText: '确定', cancelButtonText: '取消'}
-      )
-      await deleteMenu(row.id)
-      ElMessage.success('删除成功')
-      await handleQuery(queryData)
-    } catch {
-      // 取消或请求失败均在此处，错误信息已由拦截器提示
-    }
-  }
-
   const handleCancel = () => {
     dialogVisible.value = false
   }
@@ -176,45 +183,57 @@
 
   onMounted(() => {
     handleQuery(queryData)
+    loadTree()
   })
 </script>
 
 <template>
   <div class="menu-container">
-    <div class="selector round">
-      <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar
-        :show-export="false"
-        @add="handleAdd"
-        @edit="handleEdit"
-        @delete="handleDelete"
-        @refresh="handleQuery(queryData)"
-      />
-    </div>
-    <div class="table round">
-      <ProTable
-        :data="tableData?.records ?? []"
-        :columns="columns"
-        :total="tableData?.total ?? 0"
-        :page="queryData.page"
-        :page-size="queryData.pageSize"
-        @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
-        @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
-        @selectionChange="(rows) => selectedData = rows"
-      >
-        <template #visible="{row}">
-          <el-tag :type="row.visible === 1 ? 'primary' : 'info'" size="small">
-            {{ row.visible === 1 ? '显示' : '隐藏' }}
-          </el-tag>
-        </template>
-        <template #status="{row}">
-          <el-tag :type="row.status === 'ENABLE' ? 'success' : 'danger'" size="small">
-            {{ row.status === 'ENABLE' ? '启用' : '禁用' }}
-          </el-tag>
-        </template>
-      </ProTable>
+    <div class="page-body">
+      <div class="tree round">
+        <ProTree
+          :data="treeData"
+          :tree-props="{label: 'title', children: 'children'}"
+          show-root
+          @node-click="handleTreeClick" />
+      </div>
+      <div class="content">
+        <div class="selector round">
+          <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+        </div>
+        <div class="toolbar round">
+          <ProToolbar
+            :show-export="false"
+            @add="handleAdd"
+            @edit="handleEdit"
+            @delete="handleDelete"
+            @refresh="handleQuery(queryData)"
+          />
+        </div>
+        <div class="table round">
+          <ProTable
+            :data="tableData?.records ?? []"
+            :columns="columns"
+            :total="tableData?.total ?? 0"
+            :page="queryData.page"
+            :page-size="queryData.pageSize"
+            @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
+            @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
+            @selectionChange="(rows) => selectedData = rows"
+          >
+            <template #visible="{row}">
+              <el-tag :type="row.visible === 1 ? 'primary' : 'info'" size="small">
+                {{ row.visible === 1 ? '显示' : '隐藏' }}
+              </el-tag>
+            </template>
+            <template #status="{row}">
+              <el-tag :type="row.status === 'ENABLE' ? 'success' : 'danger'" size="small">
+                {{ row.status === 'ENABLE' ? '启用' : '禁用' }}
+              </el-tag>
+            </template>
+          </ProTable>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -235,6 +254,29 @@
     height: 100%;
     width: 100%;
 
+    .page-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      gap: 8px;
+
+      .tree {
+        width: 240px;
+        flex: 0 0 240px;
+        background: #ffffff;
+        border: 1px solid #e4e7ed;
+        overflow: hidden;
+      }
+
+      .content {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
     .selector {
       width: 100%;
       background: #ffffff;
@@ -245,14 +287,6 @@
       width: 100%;
       flex: 1;
       min-height: 0;
-    }
-
-    .danger-btn {
-      color: #f56c6c;
-
-      &:hover {
-        color: #f78989;
-      }
     }
   }
 </style>

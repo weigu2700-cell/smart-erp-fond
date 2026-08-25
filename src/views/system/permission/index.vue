@@ -3,16 +3,19 @@
   import {ElMessage} from "element-plus";
   import ProToolbar from "@/components/ProToolbar.vue";
   import ProTable, {type ProColumn} from "@/components/ProTable.vue";
+  import ProTree from "@/components/ProTree.vue";
   import Selector from "@/views/system/permission/component/selector.vue";
   import SaveDialog from "@/views/system/permission/saveDialog.vue";
   import {
     getPermissionList,
+    getPermissionTree,
     createPermission,
     updatePermission
   } from "@/api/system/permission.ts";
   import type {
     PermissionListRequest,
     PermissionListResponse,
+    PermissionNode,
     PermissionSaveRequest
   } from "@/types/system/permission.ts";
 
@@ -23,6 +26,7 @@
   const dialogVisible = ref(false)
   const editRow = ref<EditRow | null>(null)
   const selectedData = ref<PermissionListResponse['records']>([])
+  const treeData = ref<PermissionNode[]>([])
   const queryData = reactive<PermissionListRequest>({
     page: 1,
     pageSize: 10,
@@ -59,6 +63,21 @@
     queryData.code = null
     queryData.type = null
     queryData.status = null
+    queryData.page = 1
+    handleQuery(queryData)
+  }
+
+  const loadTree = async () => {
+    try {
+      treeData.value = await getPermissionTree()
+    } catch {
+      // 错误信息已由请求拦截器统一提示
+    }
+  }
+
+  // 点击左侧权限树，按 parentId 过滤右侧列表
+  const handleTreeClick = (node: PermissionNode | {id: string}) => {
+    queryData.parentId = (node as {id: string}).id === '__all__' ? null : (node as PermissionNode).id
     queryData.page = 1
     handleQuery(queryData)
   }
@@ -132,48 +151,56 @@
 
   onMounted(() => {
     handleQuery(queryData)
+    loadTree()
   })
 </script>
 
 <template>
   <div class="permission-container">
-    <div class="selector round">
-      <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar
-        :show-delete="false"
-        :show-export="false"
-        @add="handleAdd"
-        @edit="handleEdit"
-        @refresh="handleQuery(queryData)"
-      />
-    </div>
-    <div class="table round">
-      <ProTable
-        :data="tableData?.records ?? []"
-        :columns="columns"
-        :total="tableData?.total ?? 0"
-        :page="queryData.page"
-        :page-size="queryData.pageSize"
-        @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
-        @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
-        @selectionChange="(rows) => selectedData = rows"
-      >
-        <template #type="{row}">
-          <el-tag :type="row.type === 'MENU' ? 'primary' : 'warning'" size="small">
-            {{ row.type === 'MENU' ? '菜单' : '按钮' }}
-          </el-tag>
-        </template>
-        <template #status="{row}">
-          <el-tag :type="row.status === 'ENABLE' ? 'success' : 'danger'" size="small">
-            {{ row.status === 'ENABLE' ? '启用' : '禁用' }}
-          </el-tag>
-        </template>
-        <template #actions="{row}">
-          <el-button type="text" @click="openEditDialog(row)">修改</el-button>
-        </template>
-      </ProTable>
+    <div class="page-body">
+      <div class="tree round">
+        <ProTree :data="treeData" show-root @node-click="handleTreeClick" />
+      </div>
+      <div class="content">
+        <div class="selector round">
+          <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+        </div>
+        <div class="toolbar round">
+          <ProToolbar
+            :show-delete="false"
+            :show-export="false"
+            @add="handleAdd"
+            @edit="handleEdit"
+            @refresh="handleQuery(queryData)"
+          />
+        </div>
+        <div class="table round">
+          <ProTable
+            :data="tableData?.records ?? []"
+            :columns="columns"
+            :total="tableData?.total ?? 0"
+            :page="queryData.page"
+            :page-size="queryData.pageSize"
+            @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
+            @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
+            @selectionChange="(rows) => selectedData = rows"
+          >
+            <template #type="{row}">
+              <el-tag :type="row.type === 'MENU' ? 'primary' : 'warning'" size="small">
+                {{ row.type === 'MENU' ? '菜单' : '按钮' }}
+              </el-tag>
+            </template>
+            <template #status="{row}">
+              <el-tag :type="row.status === 'ENABLE' ? 'success' : 'danger'" size="small">
+                {{ row.status === 'ENABLE' ? '启用' : '禁用' }}
+              </el-tag>
+            </template>
+            <template #actions="{row}">
+              <el-button type="text" @click="openEditDialog(row)">修改</el-button>
+            </template>
+          </ProTable>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -193,6 +220,29 @@
     gap: 8px;
     height: 100%;
     width: 100%;
+
+    .page-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      gap: 8px;
+
+      .tree {
+        width: 240px;
+        flex: 0 0 240px;
+        background: #ffffff;
+        border: 1px solid #e4e7ed;
+        overflow: hidden;
+      }
+
+      .content {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
 
     .selector {
       width: 100%;
