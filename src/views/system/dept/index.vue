@@ -3,10 +3,10 @@ import {onMounted, reactive, ref} from "vue"
 import {ElMessage} from "element-plus";
 import type {deptResponse, deptRequest, deptColumns, saveDeptRequest} from "@/types/system/dept.ts";
 import {getDeptList, saveDept, updateDept} from "@/api/system/dept.ts";
-import Table from "@/views/system/dept/component/table.vue";
-import Toolbar from "@/views/system/dept/component/toolbar.vue";
 import SaveDialog from "@/views/system/dept/saveDialog.vue";
 import Selector from "@/views/system/dept/component/selector.vue";
+import ProTable from "@/components/ProTable.vue";
+import ProToolbar from "@/components/ProToolbar.vue";
 
 
   const tableData = ref<deptResponse>()
@@ -25,9 +25,9 @@ import Selector from "@/views/system/dept/component/selector.vue";
   })
 
 const columns:deptColumns[] = [
-  { label: '部门名称', prop: 'name', width: 140, sortable: true, fixed: 'left' },
-  { label: '部门编码', prop: 'code', width: 140, sortable: true, fixed: 'left' },
-  { label: '上级部门', prop: 'parentName', width: 140, sortable: true, fixed: 'left' },
+  { label: '部门名称', prop: 'name', width: 240, sortable: true, fixed: 'left' },
+  { label: '部门编码', prop: 'code', width: 240, sortable: true, fixed: 'left' },
+  { label: '上级部门', prop: 'parentName', width: 240, sortable: true, fixed: 'left' },
   { label: '创建时间', prop: 'createTime', width: 200, sortable: true, fixed: 'left' },
 ]
 
@@ -114,22 +114,23 @@ const columns:deptColumns[] = [
       <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
     </div>
     <div class="toolbar round">
-      <Toolbar
-        @handleAdd="handleAdd"
-        @handleEdit="handleEdit"
-        @handleDelete="handleDelete"
-        @handleRefresh="handleQuery(queryData)"
+      <ProToolbar
+        @add="handleAdd"
+        @edit="handleEdit"
+        @delete="handleDelete"
+        @refresh="handleQuery(queryData)"
       />
     </div>
     <div class="table round">
-      <Table
-        :table="tableData"
+      <ProTable
+        :data="tableData?.records ?? []"
         :columns="columns"
+        :total="tableData?.total ?? 0"
         :page="queryData.page"
         :page-size="queryData.pageSize"
         @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
         @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
-        @selectionChange="(rows) => selectedData = rows"
+        @selectionChange="(rows) => selectedData = rows as deptResponse['records']"
       />
     </div>
     <SaveDialog
@@ -154,7 +155,6 @@ const columns:deptColumns[] = [
 
     .selector {
       width: 100%;
-      height: 100px;
       background: #ffffff;
       border: 1px solid #e4e7ed;
     }

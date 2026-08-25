@@ -3,6 +3,7 @@
   import ParentDeptSelector from "@/views/system/dept/component/parentDeptSelector.vue";
   import {CircleClose, Search} from "@element-plus/icons-vue";
   import type {deptRequest} from "@/types/system/dept.ts";
+  import ProSearch from "@/components/ProSearch.vue";
 
   let parentSelectorVisible = ref(false)
 
@@ -62,58 +63,37 @@
 </script>
 
 <template>
-  <div class="selector-container">
-    <div class="selector-search">
-      <el-input v-model="queryData.name" placeholder="请输入部门名称" />
-      <el-input v-model="queryData.code" placeholder="请输入部门编码" />
-      <el-input
-        :model-value="queryData.parentName"
-        readonly
-        placeholder="点击选择上级部门"
-        @click="openParentSelector"
-      >
-        <template #suffix>
-          <el-icon v-if="queryData.parentName" class="field-icon" @click.stop="clearParent">
-            <CircleClose />
-          </el-icon>
-          <el-icon v-else class="field-icon" @click.stop="openParentSelector">
-            <Search />
-          </el-icon>
-        </template>
-      </el-input>
-      <el-select v-model="queryData.status" placeholder="请选择状态">
-        <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
-    </div>
-    <div class="submit-button">
-      <el-button type="primary" @click="handleQuery">查询</el-button>
-      <el-button type="info" @click="handleReset">重置</el-button>
-    </div>
-  </div>
+  <ProSearch class="dept-selector" @search="handleQuery" @reset="handleReset">
+    <el-input v-model="queryData.name" placeholder="部门名称" clearable style="width: 160px; flex: 0 0 160px" />
+    <el-input v-model="queryData.code" placeholder="部门编码" clearable style="width: 160px; flex: 0 0 160px" />
+    <el-input
+      :model-value="queryData.parentName"
+      readonly
+      placeholder="点击选择上级部门"
+      @click="openParentSelector"
+      style="width: 160px; flex: 0 0 160px"
+    >
+      <template #suffix>
+        <el-icon v-if="queryData.parentName" class="field-icon" @click.stop="clearParent">
+          <CircleClose />
+        </el-icon>
+        <el-icon v-else class="field-icon" @click.stop="openParentSelector">
+          <Search />
+        </el-icon>
+      </template>
+    </el-input>
+    <el-select v-model="queryData.status" placeholder="请选择状态" clearable style="width: 120px; flex: 0 0 120px">
+      <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+    </el-select>
+  </ProSearch>
   <ParentDeptSelector :visible="parentSelectorVisible" @select="handleParentSelect"/>
 </template>
 
 <style scoped>
-  .selector-container {
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  .dept-selector {
 
-    .selector-search {
-      display: flex;
-      gap: 20px;
-
-      :deep(.el-input) {
-        width: 80px;
-      }
-
-      :deep(.el-select) {
-        width: 80px;
-      }
+    .field-icon {
+      cursor: pointer;
     }
-
   }
 </style>
