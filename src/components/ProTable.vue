@@ -34,6 +34,12 @@
 
   const handleSelectionChange = (rows: T[]) => emit('selectionChange', rows)
 
+  // 暴露给父组件：清空表格勾选状态（与外部 selectedRowId 状态保持同步）
+  const tableRef = ref<{ clearSelection: () => void }>()
+  defineExpose({
+    clearSelection: () => tableRef.value?.clearSelection(),
+  })
+
   // 把最后一列转为弹性列（min-width），吃掉剩余空间使表格撑满
   const tableColumns = computed(() => {
     const cols = props.columns.map((c) => ({...c}))
@@ -72,6 +78,7 @@
 <template>
   <div ref="containerRef" class="pro-table-container">
     <el-table
+      ref="tableRef"
       :data="props.data"
       :max-height="tableHeight"
       style="width: 100%"
