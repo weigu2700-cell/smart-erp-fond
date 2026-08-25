@@ -1,733 +1,123 @@
----
-
-```md
 # SmartERP Frontend
 
-<p align="center">
-  <b>SmartERP 智能制造 ERP 管理系统前端</b>
-</p>
+基于 Vue 3 + TypeScript + Vite + Element Plus 的企业级 ERP 管理系统前端，采用前后端分离架构，实现了基于 RBAC 的权限控制体系。
 
-<p align="center">
-  基于 Vue3 + TypeScript + Vite 构建的企业级 ERP 管理后台前端项目
-</p>
+配套后端：Spring Boot + Spring Security + JWT + MyBatis-Plus + MySQL，后端仓库见 [weigu2700-cell/smart-erp](https://github.com/weigu2700-cell/smart-erp)。
 
+## 技术栈
 
-## 项目介绍
+| 分类 | 技术 | 版本 |
+| --- | --- | --- |
+| 核心框架 | Vue | ^3.5 |
+|  | TypeScript | ~6.0 |
+|  | Vite | ^8.1 |
+|  | Vue Router | ^5.2 |
+|  | Pinia | ^4.0 |
+| UI | Element Plus | ^2.14 |
+|  | @element-plus/icons-vue | ^2.3 |
+| 请求 | Axios | ^1.19 |
+| 工具 | VueUse | ^14.4 |
+| 工程化 | ESLint / Prettier / Oxlint / Vitest / vue-tsc | - |
 
-SmartERP Frontend 是 SmartERP 智能制造 ERP 系统的前端项目。
+> Node.js 版本要求：`^22.18.0 || >=24.12.0`（见 `package.json` engines）。
 
-项目采用当前主流 Vue3 工程化开发模式：
+## 功能特性
 
-- Vue3 Composition API
-- TypeScript
-- Vite
-- Pinia
-- Vue Router
-- Element Plus
-- Axios
+- 登录认证：JWT Token 登录、Token 自动携带、401 自动退出
+- 动态路由：菜单由后端下发，按 `component` 字段自动映射 `src/views/**/*.vue` 生成路由
+- 系统管理（完整 CRUD）：
+  - 用户：分页列表、新增/编辑、删除、分配角色、分配部门
+  - 角色：分页列表、新增/编辑、删除、分配权限、分配菜单
+  - 菜单：左侧树 + 列表、新增/编辑（图标选择器、父级菜单选择器）、删除、显示/隐藏
+  - 部门：左侧树 + 列表、新增/编辑、删除
+  - 权限：左侧树 + 列表、新增/编辑、删除
+- 通用组件：ProTable（表格）、ProSearch（查询区）、ProToolbar（操作栏）、ProPagination（分页）、ProTree（左侧树）
 
-
-项目目标：
-
-- 构建企业级 ERP 管理后台
-- 实践前后端分离架构
-- 掌握大型后台项目工程化设计
-- 实现 RBAC 权限控制
-- 完成制造企业业务流程可视化
-
-
-对应后端项目：
-
-SmartERP Backend
-
-技术栈：
-
-- Spring Boot
-- Spring Security
-- JWT
-- MyBatis-Plus
-- MySQL
-
-
-> 🚧 项目持续开发中
-
-
----
-
-# 技术栈
-
-
-## 核心框架
-
-| 技术 | 版本 |
-|-|-|
-| Vue | 3.5 |
-| TypeScript | 6 |
-| Vite | 8 |
-| Vue Router | 5 |
-| Pinia | 4 |
-
-
-## UI组件
-
-- Element Plus
-
-
-## 网络请求
-
-- Axios
-
-
-## 工程化
-
-- ESLint
-- Prettier
-- Vitest
-- VueUse
-
-
-
----
-
-# 项目特点
-
-
-## 1. Vue3 + TypeScript 开发模式
-
-
-项目统一采用：
-
-```vue
-<script setup lang="ts">
-
-</script>
-```
-
-
-使用 Composition API 组织业务。
-
-
-避免传统 Vue2 Options API：
-
-```js
-data()
-
-methods()
-
-computed()
-
-```
-
-提升代码复用能力和类型安全。
-
-
-
----
-
-# 2. 模块化项目结构
-
-
-当前目录设计：
-
+## 项目结构
 
 ```
 src
-├── api
-│   ├── system
-│   ├── master
-│   └── inventory
-│
-├── components
-│
-├── composables
-│
-├── layouts
-│
-├── router
-│
-├── stores
-│
-├── types
-│
-├── utils
-│
-└── views
-
+├── api/                 # 接口层（按业务模块拆分，禁止页面直接调 axios）
+│   ├── system/          #  auth / user / role / menu / dept / permission
+│   ├── master/          #  基础资料（预留）
+│   └── inventory/       #  库存管理（预留）
+├── components/          # 通用组件（ProTable / ProSearch / ProToolbar / ProPagination / ProTree）
+├── composables/         # 组合式函数（预留）
+├── layout/              # 布局（BasicLayout、Sidebar 侧边栏菜单）
+├── router/              # 路由（静态路由 + 动态路由生成）
+├── selector/            # 参照选择器（预留）
+├── stores/              # Pinia（user：登录态；permission：菜单/动态路由；app：布局状态）
+├── styles/              # 全局样式
+├── types/               # 全局类型定义（system 下按模块划分）
+├── utils/               # request（axios 封装）/ auth（token）/ storage / icon
+└── views/               # 页面（system 下为 user / role / menu / dept / permission）
 ```
 
-
-按照业务领域拆分：
-
-```
-system
-    系统权限
-
-master
-    基础资料
-
-inventory
-    库存管理
-
-```
-
-
-
----
-
-# 3. Axios统一封装
-
-
-请求入口：
-
-```
-src/utils/request.ts
-```
-
-
-实现：
-
-- Axios实例封装
-- BaseURL环境配置
-- Token自动携带
-- 统一响应处理
-- HTTP错误处理
-
-
-请求流程：
-
-```
-Vue页面
-
-↓
-
-API Service
-
-↓
-
-Axios
-
-↓
-
-Spring Boot API
-
-```
-
-
-示例：
-
-```ts
-const user =
-    await request.get<UserInfo>(
-        '/system/user/current'
-    )
-```
-
-
-
----
-
-# 4. JWT认证
-
-
-当前认证流程：
-
-
-```
-用户登录
-
-↓
-
-后端验证用户名密码
-
-↓
-
-返回JWT Token
-
-↓
-
-前端保存Token
-
-↓
-
-Axios自动携带Token
-
-↓
-
-访问受保护接口
-
-```
-
-
-已实现：
-
-- 登录接口接入
-- Token存储
-- Token自动注入请求头
-- 当前用户信息获取
-
-
-
----
-
-# 5. Pinia状态管理
-
-
-项目采用 Pinia 管理全局状态。
-
-
-规划：
-
-
-```
-stores
-
-├── user.ts
-
-├── permission.ts
-
-└── app.ts
-
-```
-
-
-## User Store
-
-
-负责：
-
-- Token
-- 用户信息
-- 登录状态
-
-
-
-## Permission Store
-
-
-负责：
-
-- 菜单树
-- 权限码
-- 动态路由
-
-
-
-## App Store
-
-
-负责：
-
-- Layout状态
-- 全局配置
-
-
-
----
-
-# 6. RBAC权限体系
-
-
-项目配合后端 Spring Security 实现权限控制。
-
-
-整体流程：
-
-```
-User
-
- ↓
-
-Role
-
- ↓
-
-Permission
-
- ↓
-
-Menu
-
-```
-
-
-后端负责：
-
-- 接口权限校验
-- 数据安全
-
-
-前端负责：
-
-- 动态菜单
-- 动态路由
-- 按钮权限显示
-
-
-
----
-
-# 当前开发进度
-
-
-## 基础工程
-
-✅ Vue3 + TypeScript 初始化
-
-✅ Vite配置
-
-✅ Element Plus集成
-
-✅ Axios请求封装
-
-✅ ESLint / Prettier配置
-
-
-
-## 用户认证
-
-
-✅ 登录页面
-
-✅ JWT Token保存
-
-✅ Token自动携带
-
-✅ 当前用户信息获取
-
-
-
-## 路由系统
-
-
-🚧 Router Guard
-
-🚧 动态路由
-
-
-## 权限系统
-
-
-🚧 动态菜单
-
-🚧 按钮权限控制
-
-
-
-## 业务模块
-
-
-计划接入：
-
-
-```
-System
-
-├── User
-
-├── Role
-
-├── Menu
-
-
-Master Data
-
-├── Customer
-
-├── Supplier
-
-├── Factory
-
-├── Warehouse
-
-├── Material
-
-
-Inventory
-
-├── Stock
-
-└── Transaction
-
-```
-
-
-
----
-
-# 开发规范
-
-
-## API层
-
-
-禁止页面直接调用 Axios：
-
-
-错误：
-
-```ts
-axios.get('/xxx')
-```
-
-
-正确：
-
-```ts
-api/system/user.ts
-
-
-export function getUser(){
-
-    return request.get()
-
-}
-
-```
-
-
----
-
-## 类型规范
-
-
-接口必须定义 TypeScript 类型：
-
-
-例如：
-
-```ts
-interface UserInfo {
-
-    id:string
-
-    username:string
-
-    realName:string
-
-}
-
-```
-
-
-避免：
-
-```ts
-any
-```
-
-
----
-
-## 状态管理规范
-
-
-只把真正全局数据放入 Pinia。
-
-
-例如：
-
-适合：
-
-```
-token
-
-userInfo
-
-permissions
-
-menus
-
-```
-
-
-不适合：
-
-```
-表格数据
-
-分页参数
-
-弹窗状态
-
-```
-
-
-
----
-
-# 安装运行
-
-
-## 环境要求
-
-
-Node:
-
-```
->=22
-```
-
-
-## 安装依赖
-
+## 快速开始
 
 ```bash
+# 安装依赖
 npm install
-```
 
-
-## 启动开发环境
-
-
-```bash
+# 启动开发环境（默认 http://localhost:5173，后端代理见 .env.development）
 npm run dev
-```
 
-
-## 类型检查
-
-
-```bash
+# 类型检查
 npm run type-check
-```
 
-
-## 构建
-
-
-```bash
+# 构建
 npm run build
-```
 
+# 构建（跳过类型检查，仅打包）
+npm run build-only
 
-## 单元测试
+# 代码检查（oxlint + eslint）
+npm run lint
 
-
-```bash
+# 单元测试
 npm run test:unit
+
+# 预览构建产物
+npm run preview
 ```
 
+## 环境变量
 
+| 变量 | 说明 | 示例 |
+| --- | --- | --- |
+| `VITE_API_URL` | 后端接口地址 | `.env.development` 默认 `http://localhost:8080` |
 
----
+生产环境在 `.env.production` 中配置 `VITE_API_URL=https://your-api-domain.com/`。
 
-# 后续规划
+## 核心约定
 
+### 1. 接口与请求
 
-## 第一阶段
+- 统一走 `src/utils/request.ts` 封装的 `service`（get / post / put / del），页面禁止直接调用 axios
+- 响应自动解包：后端返回 `{ code, message, data }`，`code === 200` 时直接返回 `data`
+- Token 存于 `localStorage`（key：`smart_erp_token`），请求自动携带 `Authorization: Bearer <token>`
+- 401 自动清除 Token 并提示重新登录
 
-完成：
+### 2. ID 一律按字符串处理
 
-```
-登录
+后端主键为雪花 Long，接口统一序列化为**字符串**返回。前端任何地方都禁止 `Number(id)` 转换（19 位雪花 ID 会精度丢失），组树、比较、请求参数均以 `String(id)` 归一化。
 
-↓
+### 3. 菜单图标约定
 
-路由守卫
+- `icon` 字段存 **Element Plus 图标组件名**（如 `User`、`Setting`），组件在 `main.ts` 全局注册，侧边栏与表格用 `<component :is="menu.icon">` 动态渲染
+- 若图标值包含 `-`、空格、`.`、`/` 等字符，视为 CSS 类名（`<i :class>` 渲染），由 `src/utils/icon.ts` 的 `isClassIcon()` 判断
 
-↓
+### 4. 菜单树接口
 
-动态菜单
+- `GET /system/menu/tree`：**必须传 `dto.roleId`**，返回该角色**已分配**的菜单树；无参/空 roleId 会报错
+- 全量菜单用 `GET /system/menu/list` 分页拉取，前端按 `parentId` 组装树（参考 `role/assignDialog.vue` 的 `fetchAllMenus`）
 
-↓
+### 5. 动态路由
 
-Layout
+后端下发的菜单 `component` 字段对应 `src/views/**/*.vue` 的相对路径（不含 `.vue` 后缀），`router/routes.ts` 通过 `import.meta.glob` 匹配生成路由。
 
-↓
+## 后续规划
 
-权限控制
-
-```
-
-
-## 第二阶段
-
-完成基础资料页面：
-
-```
-客户
-
-供应商
-
-工厂
-
-仓库
-
-物料
-
-```
-
-
-## 第三阶段
-
-库存模块：
-
-```
-库存查询
-
-库存流水
-
-库存操作
-
-```
-
-
-## 第四阶段
-
-ERP核心业务：
-
-```
-销售订单
-
-采购订单
-
-BOM
-
-生产计划
-
-生产工单
-
-```
-
-
-
----
-
-# 项目定位
-
-
-SmartERP Frontend 是一个企业级 ERP 前端工程实践项目。
-
-重点学习：
-
-- Vue3工程化
-- TypeScript类型设计
-- 企业后台架构
-- RBAC权限系统
-- 前后端接口设计
-- 制造ERP业务开发
-
-
-持续开发中。
-```
-
----
-
-这个版本适合作为你的**求职项目 README**。
-
-我建议你下一步再补两个东西：
-
-1. `README` 顶部加项目截图（登录页、Layout、客户管理页面）
-2. 加一个架构图：
-
-```text
-Vue3
- |
-Axios
- |
-Spring Boot API
- |
-Spring Security JWT
- |
-MySQL
-```
+- 基础资料模块（客户 / 供应商 / 工厂 / 仓库 / 物料）
+- 库存管理模块（库存查询 / 库存流水）
+- ERP 核心业务（销售订单 / 采购订单 / BOM / 生产计划 / 生产工单）
