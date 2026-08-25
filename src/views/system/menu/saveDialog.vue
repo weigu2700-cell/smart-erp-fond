@@ -1,9 +1,15 @@
 <script setup lang="ts">
-  import {reactive, ref, watch} from "vue";
+  import {computed, reactive, ref, watch} from "vue";
   import type {FormInstance, FormRules} from "element-plus";
   import {CircleClose, Search} from "@element-plus/icons-vue";
+  import * as Icons from "@element-plus/icons-vue";
   import type {MenuSaveRequest} from "@/types/system/menu.ts";
   import ParentMenuSelector from "@/views/system/menu/component/parentMenuSelector.vue";
+
+  // Element Plus 全部图标（name: 组件名，component: 组件），供菜单图标选择
+  const iconOptions = computed(() =>
+    Object.entries(Icons).map(([name, component]) => ({name, component}))
+  )
 
   type EditRow = MenuSaveRequest & {parentName?: string}
 
@@ -114,7 +120,20 @@
         <el-input v-model="form.component" placeholder="请输入组件路径" clearable />
       </el-form-item>
       <el-form-item label="图标" prop="icon">
-        <el-input v-model="form.icon" placeholder="请输入图标名称" clearable />
+        <el-select
+          v-model="form.icon"
+          placeholder="请选择图标（可搜索）"
+          clearable
+          filterable
+          style="width: 100%"
+        >
+          <el-option v-for="opt in iconOptions" :key="opt.name" :label="opt.name" :value="opt.name">
+            <span class="icon-option">
+              <el-icon><component :is="opt.component" /></el-icon>
+              <span>{{ opt.name }}</span>
+            </span>
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="父级菜单" prop="parentId">
         <el-input
@@ -161,5 +180,11 @@
 <style scoped>
   .field-icon {
     cursor: pointer;
+  }
+
+  .icon-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 </style>

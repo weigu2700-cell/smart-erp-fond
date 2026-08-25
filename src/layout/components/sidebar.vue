@@ -2,6 +2,7 @@
   import {usePermissionStore} from "@/stores/permission.ts"
   import {useRouter} from "vue-router"
   import {computed} from "vue";
+  import {isClassIcon} from "@/utils/icon.ts";
   import type {MenuItem} from "@/types/system/menu.ts";
 
   defineOptions({ name: 'Sidebar' })
@@ -18,12 +19,14 @@
     <el-menu :default-active="router.currentRoute.value.path" router>
       <template v-for="menu in menuList" :key="menu.path">
         <el-menu-item v-if="!menu.children || menu.children.length === 0" :index="menu.path">
-          <i v-if="menu.icon" :class="menu.icon"></i>
+          <el-icon v-if="menu.icon && !isClassIcon(menu.icon)"><component :is="menu.icon" /></el-icon>
+          <i v-else-if="menu.icon" :class="menu.icon"></i>
           <span>{{menu.title}}</span>
         </el-menu-item>
         <el-sub-menu v-else :index="menu.path">
           <template #title>
-            <i v-if="menu.icon" :class="menu.icon"></i>
+            <el-icon v-if="menu.icon && !isClassIcon(menu.icon)"><component :is="menu.icon" /></el-icon>
+            <i v-else-if="menu.icon" :class="menu.icon"></i>
             <span>{{menu.title}}</span>
           </template>
           <Sidebar :menus="menu.children"/>

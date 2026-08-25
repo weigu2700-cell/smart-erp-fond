@@ -13,6 +13,7 @@
     updateMenu,
     deleteMenu
   } from "@/api/system/menu.ts";
+  import {isClassIcon} from "@/utils/icon.ts";
   import type {
     MenuListRequest,
     MenuListResponse,
@@ -44,7 +45,7 @@
     {label: '菜单编码', prop: 'name', width: 140},
     {label: '路由路径', prop: 'path', width: 160},
     {label: '父级菜单', prop: 'parentName', width: 140},
-    {label: '图标', prop: 'icon', width: 120},
+    {label: '图标', prop: 'icon', width: 140, slot: 'icon'},
     {label: '可见性', prop: 'visible', width: 100, slot: 'visible'},
     {label: '状态', prop: 'status', width: 100, slot: 'status'},
   ]
@@ -221,6 +222,14 @@
             @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
             @selectionChange="(rows) => selectedData = rows"
           >
+            <template #icon="{row}">
+              <span v-if="row.icon" class="icon-cell">
+                <el-icon v-if="!isClassIcon(row.icon)"><component :is="row.icon" /></el-icon>
+                <i v-else :class="row.icon"></i>
+                <span class="icon-name">{{ row.icon }}</span>
+              </span>
+              <span v-else>-</span>
+            </template>
             <template #visible="{row}">
               <el-tag :type="row.visible === 1 ? 'primary' : 'info'" size="small">
                 {{ row.visible === 1 ? '显示' : '隐藏' }}
@@ -253,40 +262,52 @@
     gap: 8px;
     height: 100%;
     width: 100%;
+  }
 
-    .page-body {
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      gap: 8px;
+  .menu-container .page-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 8px;
+  }
 
-      .tree {
-        width: 240px;
-        flex: 0 0 240px;
-        background: #ffffff;
-        border: 1px solid #e4e7ed;
-        overflow: hidden;
-      }
+  .menu-container .page-body .tree {
+    width: 240px;
+    flex: 0 0 240px;
+    background: #ffffff;
+    border: 1px solid #e4e7ed;
+    overflow: hidden;
+  }
 
-      .content {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-    }
+  .menu-container .page-body .content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-    .selector {
-      width: 100%;
-      background: #ffffff;
-      border: 1px solid #e4e7ed;
-    }
+  .menu-container .page-body .selector {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e4e7ed;
+  }
 
-    .table {
-      width: 100%;
-      flex: 1;
-      min-height: 0;
-    }
+  .menu-container .page-body .table {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .icon-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--el-color-primary);
+  }
+
+  .icon-cell .icon-name {
+    color: #606266;
+    font-size: 12px;
   }
 </style>
