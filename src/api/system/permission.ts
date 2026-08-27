@@ -15,7 +15,7 @@ export function getPermissionTree(): Promise<PermissionNode[]> {
   return service.get<PermissionNode[]>('system/permission/tree')
 }
 
-export function getPermissionDetail(id: number): Promise<PermissionNode> {
+export function getPermissionDetail(id: string): Promise<PermissionNode> {
   return service.get<PermissionNode>(`system/permission/${id}`)
 }
 

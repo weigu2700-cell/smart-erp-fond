@@ -20,7 +20,7 @@ export function getMenuList(data: MenuListRequest): Promise<MenuListResponse> {
 }
 
 // 菜单详情
-export function getMenuDetail(id: string | number): Promise<MenuListVO> {
+export function getMenuDetail(id: string): Promise<MenuListVO> {
   return service.get<MenuListVO>(`system/menu/${id}`)
 }
 
@@ -38,6 +38,6 @@ export function updateMenu(data: MenuSaveRequest): Promise<unknown> {
 }
 
 // 删除菜单
-export function deleteMenu(id: string | number): Promise<unknown> {
+export function deleteMenu(id: string): Promise<unknown> {
   return service.del<unknown>(`system/menu/${id}`)
 }

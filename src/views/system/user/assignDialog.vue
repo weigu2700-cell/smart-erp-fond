@@ -27,7 +27,7 @@
   const deptTreeRef = ref<InstanceType<typeof ElTree>>()
   const roleOptions = ref<RoleInfo[]>([])
   const deptTree = ref<deptTree[]>([])
-  const selectedRoleIds = ref<number[]>([])
+  const selectedRoleIds = ref<string[]>([])
   const saving = ref(false)
   const loading = ref(false)
 
@@ -62,8 +62,8 @@
     try {
       const detail = await getUserDetail(props.row.id)
       if (props.mode === 'role') {
-        // 详情返回 roleIds 为 string[]，分配接口需 number[]
-        selectedRoleIds.value = (detail.roleIds ?? []).map(Number)
+        // 详情返回 roleIds 为 string[]（雪花 ID），直接回填
+        selectedRoleIds.value = detail.roleIds ?? []
       } else {
         await nextTick()
         deptTreeRef.value?.setCurrentKey(detail.deptId ?? null)
@@ -147,7 +147,7 @@
           v-for="role in roleOptions"
           :key="role.id"
           :label="role.name"
-          :value="Number(role.id)"
+          :value="role.id"
         />
       </el-select>
 

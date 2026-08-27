@@ -28,10 +28,10 @@ export function deleteRole(id: string): Promise<unknown> {
   return service.del<unknown>(`system/role/${id}`)
 }
 
-// 分配权限（RolePermissionAssignDTO，roleId 按 int64 传 number）
+// 分配权限（RolePermissionAssignDTO，雪花 ID 字符串）
 export function assignRolePermissions(data: RolePermissionAssignRequest): Promise<unknown> {
   return service.post<unknown>(`system/role/${data.roleId}/permissions`, {
-    roleId: Number(data.roleId),
+    roleId: data.roleId,
     permissionIds: data.permissionIds,
   })
 }
@@ -39,7 +39,7 @@ export function assignRolePermissions(data: RolePermissionAssignRequest): Promis
 // 分配菜单（RoleMenuAssignDTO）
 export function assignRoleMenus(data: RoleMenuAssignRequest): Promise<unknown> {
   return service.post<unknown>(`system/role/${data.roleId}/menu`, {
-    roleId: Number(data.roleId),
+    roleId: data.roleId,
     menuIds: data.menuIds,
   })
 }

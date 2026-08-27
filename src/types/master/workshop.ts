@@ -1,10 +1,12 @@
+import type {PageResult} from '../common'
+
 export type WorkshopStatus = 'ENABLE' | 'DISABLE'
 
 export interface WorkshopVO {
-  id: number
+  id: string
   name: string
   shortName?: string
-  factoryId: number
+  factoryId: string
   factoryName?: string
   remark?: string
   status: WorkshopStatus
@@ -20,7 +22,7 @@ export interface WorkshopListRequest {
 
 export interface WorkshopCreateRequest {
   name: string
-  factoryId: number
+  factoryId: string
   shortName?: string
   remark?: string
 }
@@ -28,19 +30,13 @@ export interface WorkshopCreateRequest {
 export interface WorkshopUpdateRequest {
   name?: string
   shortName?: string
-  factoryId?: number
+  factoryId?: string
   remark?: string
 }
 
 export interface WorkshopStatusChangeRequest {
-  id: number
+  id: string
   status: WorkshopStatus
 }
 
-export interface WorkshopListResponse {
-  records: WorkshopVO[]
-  total: number
-  size: number
-  current: number
-  pages: number
-}
+export interface WorkshopListResponse extends PageResult<WorkshopVO> {}

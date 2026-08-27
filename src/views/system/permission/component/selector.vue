@@ -39,7 +39,7 @@
     queryData.parentName = null
   }
 
-  const handleParentSelect = (permission: {id: number, name: string}) => {
+  const handleParentSelect = (permission: {id: string, name: string}) => {
     queryData.parentId = permission.id
     queryData.parentName = permission.name
     parentSelectorVisible.value = false

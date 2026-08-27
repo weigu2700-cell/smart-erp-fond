@@ -44,7 +44,7 @@
     parentSelectorVisible.value = true
   }
 
-  const handleParentSelect = (permission: {id: number, name: string}) => {
+  const handleParentSelect = (permission: {id: string, name: string}) => {
     form.parentId = permission.id
     parentName.value = permission.name
   }

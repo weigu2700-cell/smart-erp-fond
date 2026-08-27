@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import TreeTableSelector, {type SelectorColumn} from "@/selector/TreeTableSelector.vue"
+  import TreeTableSelector, {type SelectorColumn, type SelectorListParams} from "@/selector/TreeTableSelector.vue"
   import type {PermissionNode} from "@/types/system/permission.ts"
   import {getPermissionTree, getPermissionList} from "@/api/system/permission.ts"
 
@@ -8,7 +8,7 @@
   }>()
   const emit = defineEmits<{
     (e: 'update:visible', visible: boolean): void
-    (e: 'select', permission: {id: number, name: string}): void
+    (e: 'select', permission: {id: string, name: string}): void
   }>()
 
   const columns: SelectorColumn<PermissionNode>[] = [
@@ -24,11 +24,11 @@
 
   const loadTree = () => getPermissionTree()
 
-  const loadList = (params: {page: number, pageSize: number, parentId: string | number | null}) => {
+  const loadList = (params: SelectorListParams) => {
     return getPermissionList({
       page: params.page,
       pageSize: params.pageSize,
-      parentId: params.parentId == null ? null : Number(params.parentId),
+      parentId: params.parentId == null ? null : String(params.parentId),
     })
   }
 

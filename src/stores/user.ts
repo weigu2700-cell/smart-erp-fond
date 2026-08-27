@@ -5,6 +5,8 @@ import type {loginRequest} from "@/types/system/auth.ts";
 import {getCurrentUser} from "@/api/system/user.ts";
 import type {UserInfo} from "@/types/system/user.ts";
 import {usePermissionStore} from "@/stores/permission.ts";
+import router from "@/router";
+import {ElMessage} from "element-plus";
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -27,10 +29,12 @@ export const useUserStore = defineStore('user', {
       }
     },
     logout() {
+      ElMessage.success('退出成功')
       removeToken()
       this.token = null
       const permissionStore=usePermissionStore()
       permissionStore.routesLoaded=false
+      router.push({name: 'login'}).then(r => r)
     },
     async getUserInfo() {
       try {

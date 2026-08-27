@@ -19,13 +19,14 @@ const queryData = reactive<WorkshopListRequest>({
     pageSize: 10,
     name: '',
     code: '',
-    factoryId: '',
+    // 未选择工厂时传 null 而不是 ''，避免后端把空字符串当成有效条件过滤导致列表查不到数据
+    factoryId: null,
   })
 
   const tableData = ref<WorkshopListResponse>()
   const visible = ref(false)
   const model = ref<'add' | 'edit'>('add')
-  const selectedRowId = ref<string | number>('')
+  const selectedRowId = ref<string>('')
   const tableRef = ref<{clearSelection: () => void}>()
 
   const columns = ref<ProColumn[]>([
@@ -39,8 +40,10 @@ const queryData = reactive<WorkshopListRequest>({
 
   const loadData = async () => {
     try {
+      // 完整记录实际发送的查询参数与后端返回，定位"保存成功但列表查不到"
+      console.log('[workshop] loadData query =', JSON.stringify(queryData))
       tableData.value = await getWorkshopList(queryData)
-      console.log('tableData', tableData.value)
+      console.log('[workshop] loadData res =', JSON.stringify(tableData.value))
     }catch {
       ElMessage.error('获取车间列表失败')
     }
@@ -55,12 +58,14 @@ const queryData = reactive<WorkshopListRequest>({
   const handleReset = () => {
     queryData.name = ''
     queryData.code = ''
-    queryData.factoryId = ''
+    queryData.factoryId = null
     queryData.page = 1
     loadData()
   }
 
   const handleSelectionChange = (rows: WorkshopVO[]) => {
+    // 诊断：确认选中行的 id 是否有值（车间 id 可能跟工厂一样返回 null）
+    console.log('[workshop] selection rows =', JSON.stringify(rows), 'id =', rows[0]?.id)
     selectedRowId.value = rows[0]?.id ?? ''
   }
 
@@ -163,7 +168,13 @@ const queryData = reactive<WorkshopListRequest>({
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
         @selectionChange="handleSelectionChange"
-      />
+      >
+        <template #status="{row}">
+          <el-tag :type="row.status === 'ENABLE' ? 'success' : 'danger'">
+            {{row.status === 'ENABLE' ? '启用' : '停用'}}
+          </el-tag>
+        </template>
+      </ProTable>
     </div>
   </div>
 
@@ -171,7 +182,6 @@ const queryData = reactive<WorkshopListRequest>({
     v-model="visible"
     :model="model"
     :selectedRowId="selectedRowId"
-    :queryData="queryData"
     @submit="handleSubmit"
     @cancel="handleCancel"
   />

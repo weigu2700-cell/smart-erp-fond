@@ -1,3 +1,5 @@
+import type {PageResult} from '../common'
+
 export type RoleStatus = 'ENABLE' | 'DISABLE'
 
 // 列表记录 / 详情（RoleInfoVO）
@@ -7,7 +9,7 @@ export interface RoleInfo {
   code: string
   sort: number
   status: RoleStatus
-  permissionIds: number[]
+  permissionIds: string[]
 }
 
 // 分页查询参数（RoleGetDTO）
@@ -21,12 +23,7 @@ export interface RoleListRequest {
 }
 
 // 分页列表响应（PageRoleInfoVO）
-export interface RoleListResponse {
-  records: RoleInfo[]
-  total: number
-  size: number
-  current: number
-}
+export interface RoleListResponse extends PageResult<RoleInfo> {}
 
 export type RoleDetailResponse = RoleInfo
 
@@ -42,11 +39,11 @@ export interface RoleSaveRequest {
 // 分配权限参数（RolePermissionAssignDTO）
 export interface RolePermissionAssignRequest {
   roleId: string
-  permissionIds: number[]
+  permissionIds: string[]
 }
 
 // 分配菜单参数（RoleMenuAssignDTO）
 export interface RoleMenuAssignRequest {
   roleId: string
-  menuIds: (string | number)[]
+  menuIds: string[]
 }

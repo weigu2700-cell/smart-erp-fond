@@ -1,3 +1,5 @@
+import type {PageResult} from '../common'
+
 export interface UserInfo {
   id: string
   username: string
@@ -15,21 +17,20 @@ export interface getUserListRequest {
   phone?: string | null
 }
 
-export interface getUserListResponse {
-  records: {
-    id: string
-    username: string
-    realName: string
-    phone?: string
-    deptName?: string
-    roles: {
-      roleName: string
-      roleKey: string
-    }
-  }[],
-  total: number
-  size: number
-  current: number
+// 用户分页记录项
+export interface UserListRecord {
+  id: string
+  username: string
+  realName: string
+  phone?: string
+  deptName?: string
+  roles: {
+    roleName: string
+    roleKey: string
+  }
+}
+
+export interface getUserListResponse extends PageResult<UserListRecord> {
   optimizeCountSql: string
   searchCount: string
 }
@@ -64,8 +65,8 @@ export interface updateUserRequest {
   status?: number | null
 }
 
-// 分配角色参数（UserRoleAssignDTO，roleIds 为 int64）
+// 分配角色参数（UserRoleAssignDTO，roleIds 为雪花 ID 字符串）
 export interface UserRoleAssignRequest {
   userId: string
-  roleIds: number[]
+  roleIds: string[]
 }

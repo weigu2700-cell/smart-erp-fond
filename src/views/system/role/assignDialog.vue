@@ -58,7 +58,6 @@
       if (all.length >= res.total || res.records.length === 0) break
       page += 1
     }
-    // id/parentId 均为字符串（雪花 Long 序列化），用 String 归一化保证匹配
     const map = new Map<string, MenuTreeNode>()
     all.forEach(m => map.set(String(m.id), {
       id: String(m.id),
@@ -131,11 +130,11 @@
       ElMessage.warning('权限树未加载完成，请稍后重试')
       return
     }
-    const keys = [...tree.getCheckedKeys(false), ...tree.getHalfCheckedKeys()]
+    const keys = [...tree.getCheckedKeys(false), ...tree.getHalfCheckedKeys()].map(k => String(k))
     saving.value = true
     try {
       if (props.mode === 'permission') {
-        await assignRolePermissions({roleId: props.row.id, permissionIds: keys as number[]})
+        await assignRolePermissions({roleId: props.row.id, permissionIds: keys})
         ElMessage.success('权限分配成功')
       } else {
         await assignRoleMenus({roleId: props.row.id, menuIds: keys})

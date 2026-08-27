@@ -1,3 +1,5 @@
+import type {PageResult} from '../common'
+
 export interface MenuItem {
   title: any
   id: string
@@ -5,7 +7,7 @@ export interface MenuItem {
   path: string
   component: string
   icon?: string
-  parentId?: string | number | null
+  parentId?: string | null
   children?: MenuItem[]
 }
 
@@ -17,7 +19,7 @@ export interface MenuListRequest {
   pageSize: number
   title: string | null
   name: string | null
-  parentId: string | number | null
+  parentId: string | null
   visible: number | null
   status: MenuStatus | null
 }
@@ -37,12 +39,7 @@ export interface MenuListVO {
 }
 
 // 菜单分页响应（PageMenuListVO）
-export interface MenuListResponse {
-  records: MenuListVO[]
-  total: number
-  size: number
-  current: number
-}
+export interface MenuListResponse extends PageResult<MenuListVO> {}
 
 // 菜单新增/更新 DTO（MenuCreateDTO）
 export interface MenuCreateRequest {
@@ -51,14 +48,14 @@ export interface MenuCreateRequest {
   path: string
   component: string
   icon: string | null
-  parentId: string | number | null
+  parentId: string | null
   visible: number
   status: MenuStatus
 }
 
 // 保存表单（编辑时携带 id）
 export interface MenuSaveRequest extends MenuCreateRequest {
-  id?: string | number
+  id?: string
 }
 
 // 菜单树节点（MenuTreeVO，用于父级菜单参照选择）

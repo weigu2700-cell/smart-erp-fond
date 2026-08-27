@@ -1,3 +1,5 @@
+import type {PageResult} from '../common'
+
 export type FactoryStatus = 'ENABLE' | 'DISABLE'
 
 export interface FactoryListRequest {
@@ -19,13 +21,7 @@ export interface FactoryVO {
   remark?: string
 }
 
-export interface FactoryListResponse {
-  records: FactoryVO[]
-  total: number
-  size: number
-  current: number
-  pages: number
-}
+export interface FactoryListResponse extends PageResult<FactoryVO> {}
 
 
 export interface addOrUpdateFactoryRequest {

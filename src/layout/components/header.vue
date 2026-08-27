@@ -76,7 +76,7 @@
             <el-dropdown-item>个人中心</el-dropdown-item>
             <el-dropdown-item>我的设置</el-dropdown-item>
             <el-dropdown-item>清除缓存</el-dropdown-item>
-            <el-dropdown-item divided> 退出登录</el-dropdown-item>
+            <el-dropdown-item divided @click="userStore.logout"> 退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>

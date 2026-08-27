@@ -30,7 +30,7 @@
       pageSize: params.pageSize,
       title: null,
       name: null,
-      parentId: params.parentId,
+      parentId: params.parentId == null ? null : String(params.parentId),
       visible: null,
       status: null,
     })

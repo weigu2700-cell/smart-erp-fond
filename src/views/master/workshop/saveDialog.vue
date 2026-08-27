@@ -13,7 +13,7 @@
   const props = defineProps<{
     modelValue: boolean
     model: 'add' | 'edit'
-    selectedRowId: string | number
+    selectedRowId: string
   }>()
 
   const emit = defineEmits<{
@@ -28,7 +28,8 @@
   const form = reactive<{
     name: string
     shortName: string
-    factoryId?: number
+    // factoryId 是工厂主键 id（雪花 ID 字符串），原样传递，不能 Number() 强转
+    factoryId?: string
     remark: string
   }>({
     name: '',
@@ -48,6 +49,8 @@
     dialogVisible.value = v
   })
   watch(dialogVisible, (v) => {
+    // 同步回父组件，保证 v-model 语义完整（点 X / 遮罩关闭也能同步）
+    emit('update:modelValue', v)
     if (!v) emit('cancel')
   })
 
@@ -75,9 +78,23 @@
     }
   })
 
+  const handleFactoryChange = (v: string | number | null | undefined) => {
+    console.log('[saveDialog] handleFactoryChange ->', v)
+    form.factoryId = v == null ? undefined : String(v)
+    formRef.value?.validateField('factoryId').catch(() => {})
+  }
+
   const handleSubmit = async () => {
-    const valid = await formRef.value?.validate().catch(() => false)
-    if (!valid) return
+    if (!formRef.value) {
+      ElMessage.error('表单未初始化，请重新打开对话框')
+      return
+    }
+    const valid = await formRef.value.validate().catch(() => false)
+    console.log('[saveDialog] handleSubmit valid =', valid, 'form =', {...form})
+    if (!valid) {
+      ElMessage.warning('请完善必填项后再保存')
+      return
+    }
     emit('submit', {...form})
   }
 
@@ -102,7 +119,10 @@
         <el-input v-model="form.shortName" placeholder="请输入车间简称" clearable />
       </el-form-item>
       <el-form-item label="所属工厂" prop="factoryId">
-        <FactoryRefer v-model="form.factoryId" />
+        <FactoryRefer
+          :model-value="form.factoryId"
+          @update:model-value="handleFactoryChange"
+        />
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入备注" />

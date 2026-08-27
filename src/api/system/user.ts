@@ -29,10 +29,10 @@ export function updateUser(data: updateUserRequest) {
   return service.put(`system/user/${data.id}`, data)
 }
 
-// 分配角色（UserRoleAssignDTO，userId 按 int64 传 number）
+// 分配角色（UserRoleAssignDTO，雪花 ID 字符串）
 export function assignUserRoles(data: UserRoleAssignRequest) {
   return service.post(`system/user/${data.userId}/roles`, {
-    userId: Number(data.userId),
+    userId: data.userId,
     roleIds: data.roleIds,
   })
 }

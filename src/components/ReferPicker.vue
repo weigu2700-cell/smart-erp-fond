@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import {reactive, ref, watch} from "vue";
   import {ElMessage} from "element-plus";
+  import {OfficeBuilding, CircleClose} from '@element-plus/icons-vue';
 
   export interface ReferColumn {
     prop: string
@@ -51,6 +52,17 @@
   })
   query[props.searchField] = ''
 
+  // 从行对象中取值，valueKey 取不到时兜底常见 id 字段名
+  // 注意：code 不作为兜底，避免工厂场景把业务编码（FT...）当成主键 id 传给后端导致 404
+  const getRowValue = (row: ReferRow): string | number | null => {
+    const v = row[props.valueKey]
+    if (v != null) return v
+    for (const key of ['id', 'factoryId', 'deptId', 'roleId', 'menuId', 'userId']) {
+      if (row[key] != null) return row[key]
+    }
+    return null
+  }
+
   const openDialog = () => {
     dialogVisible.value = true
     loadData()
@@ -60,10 +72,12 @@
     loading.value = true
     try {
       const res = await props.fetcher({...query, ...props.extraParams})
-      list.value = res.records
+      list.value = res?.records ?? []
+      console.log('[ReferPicker] loadData res =', res)
+      console.log('[ReferPicker] record keys =', Object.keys(list.value[0] ?? {}), 'first =', JSON.stringify(list.value[0] ?? null))
       // 若已有选中值，回填显示文本
       if (props.modelValue != null && !displayText.value) {
-        const hit = res.records.find(r => String(r[props.valueKey]) === String(props.modelValue))
+        const hit = list.value.find(r => String(getRowValue(r)) === String(props.modelValue))
         if (hit) displayText.value = hit[props.labelKey]
       }
     } catch {
@@ -79,8 +93,11 @@
   }
 
   const selectRow = (row: ReferRow) => {
-    displayText.value = row[props.labelKey]
-    emit('update:modelValue', row[props.valueKey])
+    const value = getRowValue(row)
+    console.log('[ReferPicker] selectRow keys =', Object.keys(row))
+    console.log('[ReferPicker] selectRow row =', JSON.stringify(row), 'value =', value)
+    displayText.value = row[props.labelKey] ?? ''
+    emit('update:modelValue', value)
     emit('change', row)
     dialogVisible.value = false
   }
@@ -103,12 +120,14 @@
     :model-value="displayText"
     :placeholder="placeholder"
     readonly
-    clearable
     @click="openDialog"
-    @clear="clearValue"
   >
     <template #suffix>
-      <el-icon class="refer-suffix-icon" @click="openDialog">
+      <!-- 自定义图标，click.stop 防止冒泡干扰；清除与打开分离，避免 clearable 图标冒泡冲突 -->
+      <el-icon v-if="displayText" class="refer-suffix-icon" @click.stop="clearValue">
+        <CircleClose />
+      </el-icon>
+      <el-icon class="refer-suffix-icon" @click.stop="openDialog">
         <OfficeBuilding />
       </el-icon>
     </template>
@@ -137,7 +156,6 @@
       height="360"
       highlight-current-row
       @row-click="selectRow"
-      @row-dblclick="selectRow"
     >
       <el-table-column
         v-for="col in columns"
