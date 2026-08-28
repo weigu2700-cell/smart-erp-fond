@@ -2,6 +2,8 @@
 
 基于 Vue 3 + TypeScript + Vite + Element Plus 的企业级 ERP 管理系统前端，采用前后端分离架构，实现了基于 RBAC 的权限控制体系。
 
+项目名称：**原点 ERP · ORIGIN**。原点代表主数据、流程和业务协作的统一起点。
+
 配套后端：Spring Boot + Spring Security + JWT + MyBatis-Plus + MySQL，后端仓库见 [weigu2700-cell/smart-erp](https://github.com/weigu2700-cell/smart-erp)。
 
 ## 技术栈
@@ -24,7 +26,10 @@
 ## 功能特性
 
 - 登录认证：JWT Token 登录、Token 自动携带、401 自动退出
-- 动态路由：菜单由后端下发，按 `component` 字段自动映射 `src/views/**/*.vue` 生成路由
+- 动态路由：菜单由后端下发，按 `component` 字段自动映射 `src/views/**/*.vue` 生成路由，并兼容完整/相对路径、驼峰与下划线目录
+- 工作台：工作台菜单固定在一级菜单第一位，侧边栏收起时显示图标与缩小文字
+- 主题系统：支持浅色/深色模式及多套低饱和配色，菜单、Header、内容区和组件会同步变色
+- 原点品牌：内置 ORIGIN 品牌 Logo、登录页视觉背景和统一的 ERP 内容页布局
 - 系统管理（完整 CRUD）：
   - 用户：分页列表、新增/编辑、删除、分配角色、分配部门
   - 角色：分页列表、新增/编辑、删除、分配权限、分配菜单
@@ -59,7 +64,7 @@ src
 # 安装依赖
 npm install
 
-# 启动开发环境（默认 http://localhost:5173，后端代理见 .env.development）
+# 启动开发环境（默认 http://localhost:5173，接口直连 VITE_API_URL）
 npm run dev
 
 # 类型检查
@@ -87,7 +92,9 @@ npm run preview
 | --- | --- | --- |
 | `VITE_API_URL` | 后端接口地址 | `.env.development` 默认 `http://localhost:8080` |
 
-生产环境在 `.env.production` 中配置 `VITE_API_URL=https://your-api-domain.com/`。
+开发环境不使用 Vite 代理，浏览器直接请求 `VITE_API_URL` 指向的后端地址，因此后端需要正确配置 CORS。
+
+生产环境在 `.env.production` 中配置 `VITE_API_URL=https://your-api-domain.com/`，并确保后端允许前端域名跨域访问。
 
 ## 核心约定
 
@@ -114,7 +121,19 @@ npm run preview
 
 ### 5. 动态路由
 
-后端下发的菜单 `component` 字段对应 `src/views/**/*.vue` 的相对路径（不含 `.vue` 后缀），`router/routes.ts` 通过 `import.meta.glob` 匹配生成路由。
+后端下发的菜单 `component` 字段对应 `src/views/**/*.vue` 的路径（通常不含 `.vue` 后缀），`router/routes.ts` 通过 `import.meta.glob` 匹配生成路由。
+
+- 支持 `master/material/index`、`master/material`、`master/material.vue` 等写法
+- 自动兼容驼峰、下划线和连字符目录名
+- 子路由支持完整路径和相对路径，避免父级路径重复拼接
+- 工作台统一映射到 `src/views/home/home.vue`
+
+### 6. 前端访问与跨域
+
+- 前端请求统一由 `VITE_API_URL` 决定，不依赖 Vite proxy
+- 后端开发地址默认为 `http://localhost:8080`
+- 后端需在 CORS 配置中允许前端开发地址（通常为 `http://localhost:5173`）
+- 生产环境应配置实际部署域名，不建议使用通配符放开所有来源
 
 ## 后续规划
 
