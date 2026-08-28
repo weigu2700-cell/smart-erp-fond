@@ -31,7 +31,11 @@ export function setupRouterGuard(router: Router) {
     if (!permissionStore.routesLoaded) {
       await permissionStore.menuLoad()
       const dynamicRoutes = generateRoutes(permissionStore.menuList)
-      dynamicRoutes.forEach(route => router.addRoute('BasicLayout', route))
+      dynamicRoutes.forEach(route => {
+        // 静态路由（如工作台 /home）优先作为兜底，避免同名动态路由覆盖正确组件。
+        if (route.name && router.hasRoute(route.name)) return
+        router.addRoute('BasicLayout', route)
+      })
       return to.fullPath
     }
 

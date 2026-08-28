@@ -52,7 +52,7 @@
   })
 
   // el-table 的 height 只接受明确的数字/px 值，字符串百分比会失效导致内容把分页器挤出
-  // 用 ResizeObserver 动态测量容器高度，减去分页器(50px)与间距(10px)后传给表格
+  // 用 ResizeObserver 动态测量容器高度，减去分页器(46px)与间距(8px)后传给表格
   const containerRef = ref<HTMLElement>()
   const tableHeight = ref(100)
 
@@ -61,7 +61,7 @@
   const updateTableHeight = () => {
     const el = containerRef.value
     if (!el) return
-    tableHeight.value = Math.max(el.clientHeight - 60, 100)
+    tableHeight.value = Math.max(el.clientHeight - 54, 100)
   }
 
   onMounted(() => {
@@ -119,7 +119,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 
     .pro-table {
       flex: 1;

@@ -26,26 +26,32 @@
 
 <template>
   <div class="pro-toolbar-container">
-    <el-button v-if="props.showAdd" type="primary" class="pro-toolbar-btn pro-toolbar-btn--add" @click="emit('add')">
-      <template #icon><Plus /></template>
-      新增
-    </el-button>
-    <el-button v-if="props.showEdit" type="default" class="pro-toolbar-btn" @click="emit('edit')">
-      <template #icon><Edit /></template>
-      修改
-    </el-button>
-    <el-button v-if="props.showDelete" type="default" class="pro-toolbar-btn pro-toolbar-btn--delete" @click="emit('delete')">
-      <template #icon><Delete /></template>
-      删除
-    </el-button>
-    <el-button v-if="props.showExport" type="default" class="pro-toolbar-btn" @click="emit('export')">
-      <template #icon><Download /></template>
-      导出
-    </el-button>
-    <el-button v-if="props.showRefresh" type="default" class="pro-toolbar-btn" @click="emit('refresh')">
-      <template #icon><Refresh /></template>
-      刷新
-    </el-button>
+    <div class="pro-toolbar-main">
+      <el-button v-if="props.showAdd" type="primary" class="pro-toolbar-btn pro-toolbar-btn--add" @click="emit('add')">
+        <template #icon><Plus /></template>
+        新增
+      </el-button>
+    </div>
+    <span v-if="props.showAdd && (props.showEdit || props.showDelete || props.showExport || props.showRefresh)" class="pro-toolbar-divider" />
+    <div class="pro-toolbar-secondary">
+      <el-button v-if="props.showEdit" text class="pro-toolbar-btn" @click="emit('edit')">
+        <template #icon><Edit /></template>
+        修改
+      </el-button>
+      <el-button v-if="props.showDelete" text class="pro-toolbar-btn pro-toolbar-btn--delete" @click="emit('delete')">
+        <template #icon><Delete /></template>
+        删除
+      </el-button>
+      <el-button v-if="props.showExport" text class="pro-toolbar-btn" @click="emit('export')">
+        <template #icon><Download /></template>
+        导出
+      </el-button>
+      <el-tooltip v-if="props.showRefresh" content="刷新" placement="top">
+        <el-button text circle class="pro-toolbar-btn pro-toolbar-btn--icon" aria-label="刷新" @click="emit('refresh')">
+          <el-icon><Refresh /></el-icon>
+        </el-button>
+      </el-tooltip>
+    </div>
     <slot />
     <div class="pro-toolbar-spacer"></div>
   </div>
@@ -54,34 +60,34 @@
 <style scoped>
   .pro-toolbar-container {
     width: 100%;
-    min-height: 56px;
+    min-height: 48px;
     height: auto;
-    padding: 10px 16px;
+    padding: 6px 12px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: #ffffff;
-    border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    gap: 10px;
+    background: var(--panel-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow-panel);
     box-sizing: border-box;
   }
 
   .pro-toolbar-container .pro-toolbar-btn {
-    height: 34px;
-    padding: 0 16px;
+    height: 32px;
+    padding: 0 10px;
     border-radius: 6px;
     font-weight: 500;
-    border: 1px solid #dadce0;
-    background: #fff;
-    color: #3c4043;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
     transition: all .2s ease;
   }
 
   .pro-toolbar-container .pro-toolbar-btn:hover,
   .pro-toolbar-container .pro-toolbar-btn:focus-visible {
-    border-color: #9aa0a6;
-    background: #f8fafd;
-    color: #202124;
+    background: var(--button-hover);
+    color: var(--text-primary);
   }
 
   .pro-toolbar-container .pro-toolbar-btn .el-icon {
@@ -89,9 +95,25 @@
     margin-right: 2px;
   }
 
+  .pro-toolbar-main,
+  .pro-toolbar-secondary {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .pro-toolbar-divider {
+    width: 1px;
+    height: 20px;
+    margin: 0 2px;
+    background: #e5e7eb;
+  }
+
   /* 只保留一个主操作，避免工具栏出现多色竞争 */
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--add {
+    min-width: 76px;
     background: var(--el-color-primary);
+    color: #fff;
     box-shadow: none;
   }
 
@@ -106,9 +128,14 @@
 
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--delete:hover,
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--delete:focus-visible {
-    border-color: #e5c2be;
     background: #fef3f2;
     color: #a11b12;
+  }
+
+  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--icon {
+    width: 32px;
+    padding: 0;
+    color: #5f6368;
   }
 
   .pro-toolbar-container .pro-toolbar-spacer {

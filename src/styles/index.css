@@ -15,7 +15,19 @@
   --border-color: #e6eaf0;
   --text-primary: #1f2937;
   --text-secondary: #64748b;
+  --menu-surface: #243447;
+  --menu-text: #d8e0ea;
+  --menu-hover: #30455f;
+  --menu-active: #1a73e8;
+  --menu-hover-bg: rgb(26 115 232 / 10%);
+  --menu-active-bg: rgb(26 115 232 / 16%);
+  --menu-sub: #1d2a3a;
+  --menu-brand-text: #ffffff;
+  --menu-brand-muted: #a8b3c4;
+  --button-hover: #f1f3f4;
   --shadow-panel: 0 1px 2px rgb(60 64 67 / 8%), 0 2px 8px rgb(60 64 67 / 6%);
+  --scrollbar-thumb: rgb(100 116 139 / 34%);
+  --scrollbar-thumb-hover: rgb(71 85 105 / 58%);
 
   --el-color-primary: #1a73e8;
   --el-color-primary-light-3: #669df0;
@@ -27,6 +39,27 @@
   --el-border-radius-base: 6px;
   --el-border-radius-small: 4px;
   --el-font-size-base: 14px;
+}
+
+html.dark {
+  --page-background: #202124;
+  --panel-background: #292a2d;
+  --border-color: #3c4043;
+  --text-primary: #e8eaed;
+  --text-secondary: #bdc1c6;
+  --menu-surface: #111827;
+  --menu-text: #cbd5e1;
+  --menu-hover: #1f2937;
+  --menu-active: #174ea6;
+  --menu-hover-bg: rgb(26 115 232 / 12%);
+  --menu-active-bg: rgb(26 115 232 / 20%);
+  --menu-sub: #0f172a;
+  --menu-brand-text: #f8fafc;
+  --menu-brand-muted: #94a3b8;
+  --button-hover: #303134;
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 28%), 0 4px 12px rgb(0 0 0 / 18%);
+  --scrollbar-thumb: rgb(148 163 184 / 34%);
+  --scrollbar-thumb-hover: rgb(203 213 225 / 58%);
 }
 
 html,
@@ -89,25 +122,107 @@ textarea {
   border-radius: 10px;
 }
 
+html.dark .el-card,
+html.dark .el-table,
+html.dark .el-table tr,
+html.dark .el-table th.el-table__cell,
+html.dark .el-table td.el-table__cell {
+  background-color: var(--panel-background);
+  color: var(--text-primary);
+}
+
+html.dark body {
+  background-color: var(--page-background);
+}
+
+html.dark .main > div[class$="-container"] {
+  background-color: var(--page-background) !important;
+}
+
+html.dark .main > div[class$="-container"] .selector,
+html.dark .main > div[class$="-container"] .toolbar {
+  background-color: var(--panel-background) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* 内容页统一为“页面背景 + 工作区面板”的 ERP 密度，避免外层容器重复套白底 */
+.main > div[class$="-container"]:not(.home-container) {
+  gap: 10px;
+  background-color: var(--page-background) !important;
+}
+
+.main > div[class$="-container"] > .selector,
+.main > div[class$="-container"] > .toolbar,
+.main > div[class$="-container"] .page-body > .content > .selector,
+.main > div[class$="-container"] .page-body > .content > .toolbar {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+html.dark .main > div[class$="-container"] > .selector,
+html.dark .main > div[class$="-container"] > .toolbar,
+html.dark .main > div[class$="-container"] .page-body > .content > .selector,
+html.dark .main > div[class$="-container"] .page-body > .content > .toolbar {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.main > div[class$="-container"] .page-body {
+  gap: 10px;
+}
+
+.main > div[class$="-container"] .page-body > .tree {
+  background: var(--panel-background) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: var(--shadow-panel);
+}
+
+html.dark .el-dialog,
+html.dark .el-drawer,
+html.dark .el-dropdown__popper,
+html.dark .el-popper,
+html.dark .el-message-box,
+html.dark .el-popover,
+html.dark .el-select-dropdown {
+  background-color: var(--panel-background);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+html.dark .el-table th.el-table__cell {
+  background-color: #303134;
+  color: #bdc1c6;
+}
+
 .center {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* 精简滚动条 */
+/* 精简滚动条：保留可发现性，但降低对内容的视觉干扰 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c0c4cc;
-  border-radius: 3px;
+  background: var(--scrollbar-thumb);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #909399;
+  background: var(--scrollbar-thumb-hover);
 }
 
 ::-webkit-scrollbar-track {

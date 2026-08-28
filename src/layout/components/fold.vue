@@ -34,13 +34,13 @@ const toggleCollapse = () => {
 .fold .el-button {
   width: 100%;
   height: 34px;
-  border: 1px solid var(--border-color);
-  background: #fff;
-  color: #5f6368;
+  border: 1px solid rgb(255 255 255 / 16%);
+  background: rgb(255 255 255 / 7%);
+  color: #d8e0ea;
 }
 
 .fold .el-button:hover {
-  background: #f1f3f4;
-  color: #202124;
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
 }
 </style>

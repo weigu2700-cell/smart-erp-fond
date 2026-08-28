@@ -75,16 +75,16 @@
 <style scoped>
   .pro-pagination {
     flex-shrink: 0;
-    height: 50px;
+    height: 46px;
     display: flex;
     align-items: center;
     padding: 10px;
     gap: 8px;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-panel);
-    background: #ffffff;
+    background: var(--panel-background);
     font-size: 13px;
-    color: #606266;
+    color: var(--text-secondary);
   }
 
   .pro-pagination .pg-total {
@@ -96,8 +96,8 @@
     padding: 0 6px;
     border: 1px solid #dcdfe6;
     border-radius: 4px;
-    background: #fff;
-    color: #606266;
+    background: var(--panel-background);
+    color: var(--text-secondary);
     font-size: 13px;
     outline: none;
     cursor: pointer;
@@ -109,8 +109,8 @@
     padding: 0 8px;
     border: 1px solid #dcdfe6;
     border-radius: 4px;
-    background: #fff;
-    color: #606266;
+    background: var(--panel-background);
+    color: var(--text-secondary);
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;

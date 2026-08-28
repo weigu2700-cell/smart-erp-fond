@@ -26,12 +26,12 @@
   .pro-search {
     height: 100%;
     width: 100%;
-    min-height: 64px;
-    padding: 12px 16px;
+    min-height: 56px;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
-    gap: 16px;
-    background: #ffffff;
+    gap: 12px;
+    background: var(--panel-background);
     border-radius: 6px;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-panel);

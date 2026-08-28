@@ -13,7 +13,7 @@ const MissingComponent = defineComponent({
       style: 'padding: 60px 20px; text-align: center; color: #909399; font-size: 14px; line-height: 2;'
     }, [
       h('div', {style: 'font-size: 16px; color: #f56c6c; margin-bottom: 8px;'}, '页面组件未找到'),
-      h('div', `请检查「系统管理-菜单管理」中该菜单的「组件路径」配置：views/${props.componentPath}.vue`),
+      h('div', `请检查「系统管理-菜单管理」中该菜单的「组件路径」配置：${props.componentPath || '(空)'}`),
       h('div', {style: 'color: #c0c4cc; font-size: 12px;'}, '组件路径示例：master/material/index（对应 src/views/master/material/index.vue）')
     ])
   }
@@ -36,43 +36,79 @@ function convertPathToSnake(str: string): string {
   return str.split('/').map(camelToSnake).join('/')
 }
 
-export function generateRoutes(menus: MenuItem[]): RouteRecordRaw[] {
+function normalizeRoutePath(path: string, parentPath = ''): string {
+  const rawPath = path.trim()
+  if (!parentPath) return rawPath
+
+  const normalizedPath = rawPath.replace(/^\/+/, '')
+  const normalizedParent = parentPath.replace(/^\/+/, '').replace(/\/+$/, '')
+  if (normalizedPath === normalizedParent) return ''
+  if (normalizedPath.startsWith(`${normalizedParent}/`)) {
+    return normalizedPath.slice(normalizedParent.length + 1)
+  }
+  // 以 / 开头但不包含父路径时，按绝对路径保留，兼容后端的独立路由配置。
+  return rawPath.startsWith('/') ? rawPath : normalizedPath
+}
+
+function isWorkbenchMenu(menu: MenuItem): boolean {
+  const normalizedPath = normalizeRoutePath(menu.path).replace(/^\/+/, '')
+  const componentPath = String(menu.component ?? '').toLowerCase()
+  return menu.name === 'home'
+    || normalizedPath === 'home'
+    || menu.title === '工作台'
+    || menu.title === '首页'
+    || /(?:^|\/)(home|dashboard)(?:\/|\.vue|$)/.test(componentPath)
+}
+
+function resolveViewComponent(rawPath?: string) {
+  if (!rawPath) return undefined
+
+  const componentPath = rawPath
+    .trim()
+    .replace(/^\/+/, '')
+    .replace(/^views\//, '')
+    .replace(/\.vue$/, '')
+  const normalizedComponentPath = componentPath.toLowerCase()
+  const snakePath = convertPathToSnake(componentPath)
+  const kebabPath = snakePath.replace(/_/g, '-')
+  const candidates = [
+    `../views/${componentPath}.vue`,
+    `../views/${componentPath}/index.vue`,
+    `../views/${snakePath}.vue`,
+    `../views/${snakePath}/index.vue`,
+    `../views/${kebabPath}.vue`,
+    `../views/${kebabPath}/index.vue`,
+  ]
+
+  // 工作台实际文件为 views/home/home.vue，兼容菜单配置中的 home / dashboard 写法。
+  if (normalizedComponentPath === 'home'
+    || normalizedComponentPath === 'home/index'
+    || normalizedComponentPath === 'dashboard'
+    || normalizedComponentPath.endsWith('/home')
+    || normalizedComponentPath.endsWith('/dashboard')) {
+    candidates.unshift('../views/home/home.vue')
+  }
+
+  for (const candidate of [...new Set(candidates)]) {
+    const component = module[candidate]
+    if (component) return component
+  }
+  return undefined
+}
+
+export function generateRoutes(menus: MenuItem[], parentPath = ''): RouteRecordRaw[] {
   return menus.map(menu => {
     const hasChildren = !!(menu.children && menu.children.length > 0)
-    
-    // 处理 component 路径：去除 .vue 后缀（如果有的话）
-    let componentPath = menu.component
-    if (componentPath && componentPath.endsWith('.vue')) {
-      componentPath = componentPath.replace(/\.vue$/, '')
-    }
-    
-    // 尝试多种路径格式匹配
-    let component = componentPath ? module[`../views/${componentPath}.vue`] : undefined
-    
-    // 如果直接匹配失败，尝试将驼峰转为下划线或连字符
-    if (!component && componentPath) {
-      const snakePath = convertPathToSnake(componentPath)
-      if (snakePath !== componentPath) {
-        component = module[`../views/${snakePath}.vue`]
-        if (!component) {
-          component = module[`../views/${snakePath}/index.vue`]
-        }
-        // 尝试连字符格式（如 material-supplier）
-        if (!component) {
-          const kebabPath = snakePath.replace(/_/g, '-')
-          component = module[`../views/${kebabPath}.vue`]
-        }
-        if (!component) {
-          const kebabPath = snakePath.replace(/_/g, '-')
-          component = module[`../views/${kebabPath}/index.vue`]
-        }
-      }
-    }
-    
-    if (!component && componentPath) {
-      // 尝试 index.vue 格式（如 master/material -> master/material/index.vue）
-      component = module[`../views/${componentPath}/index.vue`]
-    }
+    const routePath = normalizeRoutePath(menu.path, parentPath)
+    const routePathWithoutSlash = routePath.replace(/^\/+/, '').replace(/\/+$/, '')
+    const nextParentPath = routePathWithoutSlash
+      ? (parentPath ? `${parentPath}/${routePathWithoutSlash}` : routePathWithoutSlash)
+      : parentPath
+
+    const componentPath = menu.component
+    const component = isWorkbenchMenu(menu)
+      ? module['../views/home/home.vue']
+      : resolveViewComponent(componentPath)
     
     // 调试日志：输出未匹配到的组件路径
     if (componentPath && !component && !hasChildren) {
@@ -82,10 +118,10 @@ export function generateRoutes(menus: MenuItem[]): RouteRecordRaw[] {
     }
     
     const route: RouteRecordRaw = {
-      path: menu.path,
+      path: routePath,
       name: menu.name,
       meta: {title: menu.title},
-      children: hasChildren ? generateRoutes(menu.children ?? []) : []
+      children: hasChildren ? generateRoutes(menu.children ?? [], nextParentPath) : []
     }
     if (component) {
       route.component = component

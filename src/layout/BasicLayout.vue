@@ -52,7 +52,7 @@ const appStore = useAppStore()
 
 .header {
   grid-area: header;
-  background-color: #ffffff;
+  background-color: var(--panel-background);
   border-bottom: 1px solid var(--border-color);
   width: 100%;
   height: 100%;
@@ -63,7 +63,7 @@ const appStore = useAppStore()
 
 .aside {
   grid-area: aside;
-  background: #ffffff;
+  background: var(--menu-surface);
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -74,19 +74,37 @@ const appStore = useAppStore()
 }
 
 .brand {
+  position: relative;
   height: var(--header-height);
   flex: 0 0 var(--header-height);
   display: flex;
   align-items: center;
   gap: 11px;
   padding: 0 20px;
-  color: #3c4043;
+  color: var(--menu-brand-text);
   overflow: hidden;
+}
+
+.brand::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #4285f4 0 25%, #34a853 25% 50%, #fbbc04 50% 75%, #ea4335 75%);
+  opacity: .6;
 }
 
 .brand--collapsed {
   justify-content: center;
   padding: 0;
+}
+
+.brand--collapsed::after {
+  left: 16px;
+  right: 16px;
 }
 
 .brand-mark {
@@ -117,16 +135,20 @@ const appStore = useAppStore()
 }
 
 .brand-copy span {
-  color: #80868b;
+  color: var(--menu-brand-muted);
   font-size: 10px;
 }
 
 .main {
   grid-area: main;
-  padding: 24px 28px 28px;
+  padding: 18px 22px 22px;
   background-color: var(--page-background);
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
   transition: all 0.2s;
 }
 </style>
