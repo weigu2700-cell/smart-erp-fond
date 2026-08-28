@@ -6,7 +6,7 @@
 
 前端仓库：[weigu2700-cell/ORIGIN-ERP--FrontEnd](https://github.com/weigu2700-cell/ORIGIN-ERP--FrontEnd)
 
-配套后端：Spring Boot + Spring Security + JWT + MyBatis-Plus + MySQL，后端仓库见 [weigu2700-cell/smart-erp](https://github.com/weigu2700-cell/smart-erp)。
+配套后端：Spring Boot + Spring Security + JWT + MyBatis-Plus + MySQL，后端仓库见 [weigu2700-cell/ORIGIN-ERP-BackEnd](https://github.com/weigu2700-cell/ORIGIN-ERP-BackEnd)。
 
 ## 技术栈
 
