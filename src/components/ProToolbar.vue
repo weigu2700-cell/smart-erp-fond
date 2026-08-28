@@ -30,19 +30,19 @@
       <template #icon><Plus /></template>
       新增
     </el-button>
-    <el-button v-if="props.showEdit" type="warning" class="pro-toolbar-btn" @click="emit('edit')">
+    <el-button v-if="props.showEdit" type="default" class="pro-toolbar-btn" @click="emit('edit')">
       <template #icon><Edit /></template>
       修改
     </el-button>
-    <el-button v-if="props.showDelete" type="danger" class="pro-toolbar-btn" @click="emit('delete')">
+    <el-button v-if="props.showDelete" type="default" class="pro-toolbar-btn pro-toolbar-btn--delete" @click="emit('delete')">
       <template #icon><Delete /></template>
       删除
     </el-button>
-    <el-button v-if="props.showExport" type="info" class="pro-toolbar-btn" @click="emit('export')">
+    <el-button v-if="props.showExport" type="default" class="pro-toolbar-btn" @click="emit('export')">
       <template #icon><Download /></template>
       导出
     </el-button>
-    <el-button v-if="props.showRefresh" type="primary" class="pro-toolbar-btn pro-toolbar-btn--ghost" @click="emit('refresh')">
+    <el-button v-if="props.showRefresh" type="default" class="pro-toolbar-btn" @click="emit('refresh')">
       <template #icon><Refresh /></template>
       刷新
     </el-button>
@@ -71,8 +71,17 @@
     padding: 0 16px;
     border-radius: 6px;
     font-weight: 500;
-    border: none;
+    border: 1px solid #dadce0;
+    background: #fff;
+    color: #3c4043;
     transition: all .2s ease;
+  }
+
+  .pro-toolbar-container .pro-toolbar-btn:hover,
+  .pro-toolbar-container .pro-toolbar-btn:focus-visible {
+    border-color: #9aa0a6;
+    background: #f8fafd;
+    color: #202124;
   }
 
   .pro-toolbar-container .pro-toolbar-btn .el-icon {
@@ -80,7 +89,7 @@
     margin-right: 2px;
   }
 
-  /* 主操作使用 Material 风格的纯色按钮，避免工具栏过度装饰 */
+  /* 只保留一个主操作，避免工具栏出现多色竞争 */
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--add {
     background: var(--el-color-primary);
     box-shadow: none;
@@ -91,52 +100,15 @@
     background: var(--el-color-primary-dark-2);
   }
 
-  /* 修改：浅琥珀底 + 琥珀字 */
-  .pro-toolbar-container .pro-toolbar-btn.el-button--warning {
-    background: var(--el-color-warning-light-9);
-    color: var(--el-color-warning);
+  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--delete {
+    color: #b42318;
   }
 
-  .pro-toolbar-container .pro-toolbar-btn.el-button--warning:hover,
-  .pro-toolbar-container .pro-toolbar-btn.el-button--warning:focus {
-    background: var(--el-color-warning-light-8);
-    color: var(--el-color-warning);
-  }
-
-  /* 删除：浅红底 + 红字 */
-  .pro-toolbar-container .pro-toolbar-btn.el-button--danger {
-    background: var(--el-color-danger-light-9);
-    color: var(--el-color-danger);
-  }
-
-  .pro-toolbar-container .pro-toolbar-btn.el-button--danger:hover,
-  .pro-toolbar-container .pro-toolbar-btn.el-button--danger:focus {
-    background: var(--el-color-danger-light-8);
-    color: var(--el-color-danger);
-  }
-
-  /* 导出：浅灰底 + 灰字 */
-  .pro-toolbar-container .pro-toolbar-btn.el-button--info {
-    background: var(--el-color-info-light-9);
-    color: var(--el-color-info);
-  }
-
-  .pro-toolbar-container .pro-toolbar-btn.el-button--info:hover,
-  .pro-toolbar-container .pro-toolbar-btn.el-button--info:focus {
-    background: var(--el-color-info-light-8);
-    color: var(--el-color-info);
-  }
-
-  /* 刷新：浅蓝底 + 蓝字（与新增区分开） */
-  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--ghost {
-    background: var(--el-color-primary-light-9);
-    color: var(--el-color-primary);
-  }
-
-  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--ghost:hover,
-  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--ghost:focus {
-    background: var(--el-color-primary-light-8);
-    color: var(--el-color-primary);
+  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--delete:hover,
+  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--delete:focus-visible {
+    border-color: #e5c2be;
+    background: #fef3f2;
+    color: #a11b12;
   }
 
   .pro-toolbar-container .pro-toolbar-spacer {
