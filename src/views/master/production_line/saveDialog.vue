@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import {reactive, ref, watch} from "vue";
+  import {ElMessage} from "element-plus";
   import type {FormInstance, FormRules} from "element-plus";
   import WorkshopRefer from "@/selector/WorkshopRefer.vue";
   import type {ProductionLineCreateRequest, ProductionLineUpdateRequest, ProductionLineVO} from "@/types/master/productionLine.ts";
@@ -60,7 +61,10 @@
 
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate().catch(() => false)
-    if (!valid) return
+    if (!valid) {
+      ElMessage.warning('请完善必填项后再保存')
+      return
+    }
     emit('submit', {...form})
   }
 

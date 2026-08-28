@@ -125,15 +125,20 @@
   }
 
   const handleSubmit = async (form: WarehouseCreateRequest | WarehouseUpdateRequest) => {
-    if (model.value === 'edit' && selectedRowId.value) {
-      await updateWarehouse(selectedRowId.value, form as WarehouseUpdateRequest)
-    } else {
-      await createWarehouse(form as WarehouseCreateRequest)
+    try {
+      if (model.value === 'edit' && selectedRowId.value) {
+        await updateWarehouse(selectedRowId.value, form as WarehouseUpdateRequest)
+      } else {
+        await createWarehouse(form as WarehouseCreateRequest)
+      }
+      ElMessage.success('保存成功')
+      visible.value = false
+      tableRef.value?.clearSelection()
+      selectedRowId.value = undefined
+      await loadData()
+    } catch {
+      ElMessage.error('保存失败')
     }
-    visible.value = false
-    tableRef.value?.clearSelection()
-    selectedRowId.value = undefined
-    await loadData()
   }
 
   const handleCancel = () => {

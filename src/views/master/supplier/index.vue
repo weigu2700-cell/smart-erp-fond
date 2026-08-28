@@ -118,15 +118,20 @@
   }
 
   const handleSubmit = async (form: SupplierCreateRequest | SupplierUpdateRequest) => {
-    if (model.value === 'edit' && selectedRowId.value) {
-      await updateSupplier(selectedRowId.value, form as SupplierUpdateRequest)
-    } else {
-      await createSupplier(form as SupplierCreateRequest)
+    try {
+      if (model.value === 'edit' && selectedRowId.value) {
+        await updateSupplier(selectedRowId.value, form as SupplierUpdateRequest)
+      } else {
+        await createSupplier(form as SupplierCreateRequest)
+      }
+      ElMessage.success('保存成功')
+      visible.value = false
+      tableRef.value?.clearSelection()
+      selectedRowId.value = undefined
+      await loadData()
+    } catch {
+      ElMessage.error('保存失败')
     }
-    visible.value = false
-    tableRef.value?.clearSelection()
-    selectedRowId.value = undefined
-    await loadData()
   }
 
   const handleCancel = () => {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import {reactive, ref, watch} from "vue";
+  import {ElMessage} from "element-plus";
   import type {FormInstance, FormRules} from "element-plus";
   import type {SupplierCreateRequest, SupplierUpdateRequest, SupplierVO} from "@/types/master/supplier.ts";
 
@@ -67,7 +68,10 @@
 
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate().catch(() => false)
-    if (!valid) return
+    if (!valid) {
+      ElMessage.warning('请完善必填项后再保存')
+      return
+    }
     emit('submit', {...form})
   }
 

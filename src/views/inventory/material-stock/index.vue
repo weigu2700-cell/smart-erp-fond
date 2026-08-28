@@ -3,7 +3,7 @@
   import ProToolbar from "@/components/ProToolbar.vue";
   import ProTable, {type ProColumn} from "@/components/ProTable.vue"
   import {onMounted, ref, reactive} from 'vue'
-  import {getMaterialStockList} from "@/api/inventory/materialStock.ts";
+  import {createMaterialStock, getMaterialStockList} from "@/api/inventory/materialStock.ts";
   import type {MaterialStockCreateRequest, MaterialStockListRequest, MaterialStockListResponse} from "@/types/inventory/materialStock.ts";
   import SaveDialog from "@/views/inventory/material-stock/saveDialog.vue";
   import {ElMessage} from "element-plus";
@@ -57,9 +57,14 @@
   }
 
   const handleSubmit = async (form: MaterialStockCreateRequest) => {
-    visible.value = false
-    await loadData()
-    ElMessage.success('创建库存成功')
+    try {
+      await createMaterialStock(form as MaterialStockCreateRequest)
+      ElMessage.success('创建库存成功')
+      visible.value = false
+      await loadData()
+    } catch {
+      ElMessage.error('创建库存失败')
+    }
   }
 
   const handleCancel = () => {

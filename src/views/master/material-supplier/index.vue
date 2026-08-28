@@ -117,15 +117,20 @@
   }
 
   const handleSubmit = async (form: MaterialSupplierCreateRequest | MaterialSupplierUpdateRequest) => {
-    if (model.value === 'edit' && selectedRowId.value) {
-      await updateMaterialSupplier(selectedRowId.value, form as MaterialSupplierUpdateRequest)
-    } else {
-      await createMaterialSupplier(form as MaterialSupplierCreateRequest)
+    try {
+      if (model.value === 'edit' && selectedRowId.value) {
+        await updateMaterialSupplier(selectedRowId.value, form as MaterialSupplierUpdateRequest)
+      } else {
+        await createMaterialSupplier(form as MaterialSupplierCreateRequest)
+      }
+      ElMessage.success('保存成功')
+      visible.value = false
+      tableRef.value?.clearSelection()
+      selectedRowId.value = undefined
+      await loadData()
+    } catch {
+      ElMessage.error('保存失败')
     }
-    visible.value = false
-    tableRef.value?.clearSelection()
-    selectedRowId.value = undefined
-    await loadData()
   }
 
   const handleCancel = () => {

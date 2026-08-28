@@ -1,10 +1,10 @@
 <script setup lang="ts">
   import {reactive, ref, watch} from "vue";
+  import {ElMessage} from "element-plus";
   import type {FormInstance, FormRules} from "element-plus";
   import MaterialRefer from "@/selector/MaterialRefer.vue";
   import WarehouseRefer from "@/selector/WarehouseRefer.vue";
   import type {MaterialStockCreateRequest} from "@/types/inventory/materialStock.ts";
-  import {createMaterialStock} from "@/api/inventory/materialStock.ts";
 
   const props = defineProps<{
     visible: boolean
@@ -49,8 +49,10 @@
 
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate().catch(() => false)
-    if (!valid) return
-    await createMaterialStock({...form})
+    if (!valid) {
+      ElMessage.warning('请完善必填项后再保存')
+      return
+    }
     emit('submit', {...form})
   }
 

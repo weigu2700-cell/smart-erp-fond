@@ -127,15 +127,20 @@
   }
 
   const handleSubmit = async (form: MaterialCreateRequest | MaterialUpdateRequest) => {
-    if (model.value === 'edit' && selectedRowId.value) {
-      await updateMaterial(selectedRowId.value, form as MaterialUpdateRequest)
-    } else {
-      await createMaterial(form as MaterialCreateRequest)
+    try {
+      if (model.value === 'edit' && selectedRowId.value) {
+        await updateMaterial(selectedRowId.value, form as MaterialUpdateRequest)
+      } else {
+        await createMaterial(form as MaterialCreateRequest)
+      }
+      ElMessage.success('保存成功')
+      visible.value = false
+      tableRef.value?.clearSelection()
+      selectedRowId.value = undefined
+      await loadData()
+    } catch {
+      ElMessage.error('保存失败')
     }
-    visible.value = false
-    tableRef.value?.clearSelection()
-    selectedRowId.value = undefined
-    await loadData()
   }
 
   const handleCancel = () => {

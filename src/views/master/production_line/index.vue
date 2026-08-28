@@ -112,15 +112,20 @@
   }
 
   const handleSubmit = async (form: ProductionLineCreateRequest | ProductionLineUpdateRequest) => {
-    if (model.value === 'edit' && selectedRowId.value) {
-      await updateProductionLine(selectedRowId.value, form as ProductionLineUpdateRequest)
-    } else {
-      await createProductionLine(form as ProductionLineCreateRequest)
+    try {
+      if (model.value === 'edit' && selectedRowId.value) {
+        await updateProductionLine(selectedRowId.value, form as ProductionLineUpdateRequest)
+      } else {
+        await createProductionLine(form as ProductionLineCreateRequest)
+      }
+      ElMessage.success('保存成功')
+      visible.value = false
+      tableRef.value?.clearSelection()
+      selectedRowId.value = undefined
+      await loadData()
+    } catch {
+      ElMessage.error('保存失败')
     }
-    visible.value = false
-    tableRef.value?.clearSelection()
-    selectedRowId.value = undefined
-    await loadData()
   }
 
   const handleCancel = () => {

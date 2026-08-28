@@ -113,16 +113,21 @@
   }
 
   const handleSubmit = async (form: CustomerCreateRequest | CustomerUpdateRequest) => {
-    if (model.value === 'edit' && selectedRowId.value) {
-      // 客户更新接口是 PUT master/customer，id 在 body 里
-      await updateCustomer({...(form as CustomerUpdateRequest), id: selectedRowId.value})
-    } else {
-      await createCustomer(form as CustomerCreateRequest)
+    try {
+      if (model.value === 'edit' && selectedRowId.value) {
+        // 客户更新接口是 PUT master/customer，id 在 body 里
+        await updateCustomer({...(form as CustomerUpdateRequest), id: selectedRowId.value})
+      } else {
+        await createCustomer(form as CustomerCreateRequest)
+      }
+      ElMessage.success('保存成功')
+      visible.value = false
+      tableRef.value?.clearSelection()
+      selectedRowId.value = undefined
+      await loadData()
+    } catch {
+      ElMessage.error('保存失败')
     }
-    visible.value = false
-    tableRef.value?.clearSelection()
-    selectedRowId.value = undefined
-    await loadData()
   }
 
   const handleCancel = () => {

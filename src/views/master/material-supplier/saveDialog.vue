@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import {reactive, ref, watch} from "vue";
+  import {ElMessage} from "element-plus";
   import type {FormInstance, FormRules} from "element-plus";
   import MaterialRefer from "@/selector/MaterialRefer.vue";
   import SupplierRefer from "@/selector/SupplierRefer.vue";
@@ -74,7 +75,10 @@
 
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate().catch(() => false)
-    if (!valid) return
+    if (!valid) {
+      ElMessage.warning('请完善必填项后再保存')
+      return
+    }
     if (props.mode === 'edit') {
       // 后端 UpdateDTO 不含 materialId/supplierId（通过路径 id 定位关联）
       const updateForm: MaterialSupplierUpdateRequest = {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import {reactive, ref, watch} from "vue";
+  import {ElMessage} from "element-plus";
   import type {FormInstance, FormRules} from "element-plus";
   import type {MaterialCreateRequest, MaterialType, MaterialUpdateRequest, MaterialVO} from "@/types/master/material.ts";
 
@@ -73,7 +74,10 @@
 
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate().catch(() => false)
-    if (!valid) return
+    if (!valid) {
+      ElMessage.warning('请完善必填项后再保存')
+      return
+    }
     if (props.mode === 'edit') {
       // 后端 MaterialUpdateDTO 不含 type，只提交可更新字段
       const updateForm: MaterialUpdateRequest = {

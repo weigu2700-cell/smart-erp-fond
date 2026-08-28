@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import {reactive, ref, watch} from "vue";
+  import {ElMessage} from "element-plus";
   import type {FormInstance, FormRules} from "element-plus";
   import FactoryRefer from "@/selector/FactoryRefer.vue";
   import type {WarehouseCreateRequest, WarehouseType, WarehouseUpdateRequest, WarehouseVO} from "@/types/master/warehouse.ts";
@@ -72,7 +73,10 @@
 
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate().catch(() => false)
-    if (!valid) return
+    if (!valid) {
+      ElMessage.warning('请完善必填项后再保存')
+      return
+    }
     if (props.mode === 'edit') {
       // 后端 WarehouseUpdateDTO 只支持 name/address/remark
       const updateForm: WarehouseUpdateRequest = {
