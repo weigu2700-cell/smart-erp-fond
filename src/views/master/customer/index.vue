@@ -1,213 +1,193 @@
 <script setup lang="ts">
-  import Selector from "@/views/master/customer/component/selector.vue";
-  import ProToolbar from "@/components/ProToolbar.vue";
-  import ProTable, {type ProColumn} from "@/components/ProTable.vue"
-  import {onMounted, ref, reactive} from 'vue'
-  import {changeCustomerStatus, createCustomer, getCustomerList, updateCustomer} from "@/api/master/customer.ts";
-  import type {
-    CustomerCreateRequest,
-    CustomerListRequest,
-    CustomerListResponse,
-    CustomerUpdateRequest,
-    CustomerVO
-  } from "@/types/master/customer.ts";
-  import SaveDialog from "@/views/master/customer/saveDialog.vue";
-  import {ElMessage, ElMessageBox} from "element-plus";
+import Selector from "@/views/master/customer/component/selector.vue";
+import ProToolbar from "@/components/ProToolbar.vue";
+import ProTable, { type ProColumn } from "@/components/ProTable.vue"
+import { onMounted, ref, reactive } from 'vue'
+import { changeCustomerStatus, createCustomer, getCustomerList, updateCustomer } from "@/api/master/customer.ts";
+import type {
+  CustomerCreateRequest,
+  CustomerListRequest,
+  CustomerListResponse,
+  CustomerUpdateRequest,
+  CustomerVO
+} from "@/types/master/customer.ts";
+import SaveDialog from "@/views/master/customer/saveDialog.vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 
-  const queryData = reactive<CustomerListRequest>({
-    page: 1,
-    pageSize: 10,
-    name: null,
-    code: null,
-    status: null,
-  })
+const queryData = reactive<CustomerListRequest>({
+  page: 1,
+  pageSize: 10,
+  name: null,
+  code: null,
+  status: null,
+})
 
-  const tableData = ref<CustomerListResponse>()
-  const visible = ref(false)
-  const model = ref<'add' | 'edit'>('add')
-  const selectedRowId = ref<string>()
-  const tableRef = ref<{ clearSelection: () => void }>()
+const tableData = ref<CustomerListResponse>()
+const visible = ref(false)
+const model = ref<'add' | 'edit'>('add')
+const selectedRowId = ref<string>()
+const tableRef = ref<{ clearSelection: () => void }>()
 
-  const handleSelectionChange = (rows: CustomerVO[]) => {
-    selectedRowId.value = rows[0] ? String(rows[0].id) : undefined
+const handleSelectionChange = (rows: CustomerVO[]) => {
+  selectedRowId.value = rows[0] ? String(rows[0].id) : undefined
+}
+
+const loadData = async () => {
+  tableData.value = await getCustomerList(queryData)
+}
+
+const columns = ref<ProColumn[]>([
+  { label: '客户名称', prop: 'name', minWidth: 160 },
+  { label: '客户编码', prop: 'code', width: 240 },
+  { label: '简称', prop: 'shortName', width: 110 },
+  { label: '联系人', prop: 'contactName', width: 100 },
+  { label: '联系电话', prop: 'phone', width: 130 },
+  { label: '邮箱', prop: 'email', minWidth: 160 },
+  { label: '状态', prop: 'status', width: 90, slot: 'status' },
+])
+
+const handleQuery = (params: CustomerListRequest) => {
+  Object.assign(queryData, params, { page: 1 })
+  loadData()
+}
+
+const handleReset = () => {
+  queryData.name = null
+  queryData.code = null
+  queryData.status = null
+  queryData.page = 1
+  handleQuery(queryData)
+}
+
+onMounted(() => {
+  loadData()
+})
+
+const handleAdd = () => {
+  model.value = 'add'
+  visible.value = true
+}
+
+const handleEdit = () => {
+  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  if (!row) {
+    ElMessage.warning('请选择要编辑的客户')
+    return
   }
+  model.value = 'edit'
+  visible.value = true
+}
 
-  const loadData = async () => {
-    tableData.value = await getCustomerList(queryData)
+const handleDelete = async () => {
+  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  if (!row) {
+    ElMessage.warning('请选择要删除的客户')
+    return
   }
-
-  const columns = ref<ProColumn[]>([
-    {label: '客户名称', prop: 'name', minWidth: 160},
-    {label: '客户编码', prop: 'code', width: 240},
-    {label: '简称', prop: 'shortName', width: 110},
-    {label: '联系人', prop: 'contactName', width: 100},
-    {label: '联系电话', prop: 'phone', width: 130},
-    {label: '邮箱', prop: 'email', minWidth: 160},
-    {label: '状态', prop: 'status', width: 90, slot: 'status'},
-  ])
-
-  const handleQuery = (params: CustomerListRequest) => {
-    Object.assign(queryData, params, {page: 1})
-    loadData()
-  }
-
-  const handleReset = () => {
-    queryData.name = null
-    queryData.code = null
-    queryData.status = null
-    queryData.page = 1
-    handleQuery(queryData)
-  }
-
-  onMounted(() => {
-    loadData()
-  })
-
-  const handleAdd = () => {
-    model.value = 'add'
-    visible.value = true
-  }
-
-  const handleEdit = () => {
-    const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
-    if (!row) {
-      ElMessage.warning('请选择要编辑的客户')
-      return
-    }
-    model.value = 'edit'
-    visible.value = true
-  }
-
-  const handleDelete = async () => {
-    const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
-    if (!row) {
-      ElMessage.warning('请选择要删除的客户')
-      return
-    }
-    try {
-      await ElMessageBox.confirm(
-        `确定要删除客户 ${row.name} 吗？`,
-        '删除确认',
-        {
-          type: 'warning',
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-        }
-      )
-    } catch {
-      return // 用户取消
-    }
-    try {
-      await changeCustomerStatus(String(row.id), 'INACTIVE')
-      ElMessage.success('删除成功')
-      tableRef.value?.clearSelection()
-      selectedRowId.value = undefined
-      await loadData()
-    } catch {
-      ElMessage.error('删除失败')
-    }
-  }
-
-  const handleRefresh = () => {
-    loadData()
-  }
-
-  const handleSubmit = async (form: CustomerCreateRequest | CustomerUpdateRequest) => {
-    try {
-      if (model.value === 'edit' && selectedRowId.value) {
-        // 客户更新接口是 PUT master/customer，id 在 body 里
-        await updateCustomer({...(form as CustomerUpdateRequest), id: selectedRowId.value})
-      } else {
-        await createCustomer(form as CustomerCreateRequest)
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除客户 ${row.name} 吗？`,
+      '删除确认',
+      {
+        type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
       }
-      ElMessage.success('保存成功')
-      visible.value = false
-      tableRef.value?.clearSelection()
-      selectedRowId.value = undefined
-      await loadData()
-    } catch {
-      ElMessage.error('保存失败')
-    }
+    )
+  } catch {
+    return // 用户取消
   }
+  try {
+    await changeCustomerStatus(String(row.id), 'INACTIVE')
+    ElMessage.success('删除成功')
+    tableRef.value?.clearSelection()
+    selectedRowId.value = undefined
+    await loadData()
+  } catch {
+    ElMessage.error('删除失败')
+  }
+}
 
-  const handleCancel = () => {
+const handleRefresh = () => {
+  loadData()
+}
+
+const handleSubmit = async (form: CustomerCreateRequest | CustomerUpdateRequest) => {
+  try {
+    if (model.value === 'edit' && selectedRowId.value) {
+      // 客户更新接口是 PUT master/customer，id 在 body 里
+      await updateCustomer({ ...(form as CustomerUpdateRequest), id: selectedRowId.value })
+    } else {
+      await createCustomer(form as CustomerCreateRequest)
+    }
+    ElMessage.success('保存成功')
     visible.value = false
+    tableRef.value?.clearSelection()
+    selectedRowId.value = undefined
+    await loadData()
+  } catch {
+    ElMessage.error('保存失败')
   }
+}
+
+const handleCancel = () => {
+  visible.value = false
+}
 </script>
 
 <template>
-  <div class="customer-container">
-    <div class="selector">
-      <Selector
-        :queryData="queryData"
-        @query="handleQuery"
-        @reset="handleReset"
-      />
+  <div class="customer-container round">
+    <div class="selector round">
+      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
-    <div class="toolbar">
-      <ProToolbar
-        @add="handleAdd"
-        @edit="handleEdit"
-        @delete="handleDelete"
-        @refresh="handleRefresh"
-      />
+    <div class="toolbar round">
+      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
     </div>
-    <div class="table">
-      <ProTable
-        ref="tableRef"
-        :data="tableData?.records ?? []"
-        :columns="columns"
-        :total="tableData?.total ?? 0"
-        :page="queryData.page"
-        :page-size="queryData.pageSize"
+    <div class="table round">
+      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
+        :page="queryData.page" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange"
-      >
-        <template #status="{row}">
-          <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'" size="small">
-            {{ row.status === 'ACTIVE' ? '合作中' : '停用' }}
+        @selectionChange="handleSelectionChange">
+        <template #status="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
+            {{ row.status === 1 ? '启用' : '停用' }}
           </el-tag>
         </template>
       </ProTable>
     </div>
   </div>
 
-  <SaveDialog
-    :visible="visible"
-    :title="model=== 'add' ? '新增客户' : '修改客户'"
-    :mode="model"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
-    @cancel="handleCancel"
-    @submit="handleSubmit"
-  />
+  <SaveDialog :visible="visible" :title="model === 'add' ? '新增客户' : '修改客户'" :mode="model"
+    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
+    @submit="handleSubmit" />
 </template>
 
 <style scoped>
-  .customer-container {
-    width: 100%;
-    height: 100%;
-    background-color: #f0f2f5;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+.customer-container {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  .customer-container .selector {
-    width: 100%;
-    background: #ffffff;
-    border: 1px solid #e4e7ed;
-  }
+.customer-container .selector {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+}
 
-  .customer-container .toolbar {
-    width: 100%;
-    background: #ffffff;
-    border: 1px solid #e4e7ed;
-  }
+.customer-container .toolbar {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+}
 
-  .customer-container .table {
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-  }
+.customer-container .table {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
 </style>

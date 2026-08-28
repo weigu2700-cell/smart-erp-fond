@@ -11,6 +11,7 @@ export interface SupplierListRequest {
   contactName?: string | null
   phone?: string | null
   email?: string | null
+  status?: number | null
 }
 
 export interface SupplierVO {
@@ -23,7 +24,7 @@ export interface SupplierVO {
   phone?: string
   email?: string
   remark?: string
-  status?: SupplierStatus | number
+  status?: number
   createdTime?: string
 }
 
@@ -36,6 +37,7 @@ export interface SupplierCreateRequest {
   address?: string
   phone?: string
   email?: string
+  status?: number
   remark?: string
 }
 

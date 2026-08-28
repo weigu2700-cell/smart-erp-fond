@@ -60,15 +60,15 @@ const handleRefresh = () => {
 </script>
 
 <template>
-  <div class="transaction-container">
-    <div class="selector">
+  <div class="transaction-container round">
+    <div class="selector round">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
-    <div class="toolbar">
+    <div class="toolbar round">
       <ProToolbar :show-add="false" :show-edit="false" :show-delete="false" :show-export="false"
         @refresh="handleRefresh" />
     </div>
-    <div class="table">
+    <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.pageNum" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"

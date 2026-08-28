@@ -8,7 +8,7 @@ export interface MaterialSupplierListRequest {
   materialSupplierCode?: string | null
   materialId?: string | null
   supplierId?: string | null
-  status?: MaterialSupplierStatus | null
+  status?: number | null
   preferred?: number | null
 }
 
@@ -22,7 +22,7 @@ export interface MaterialSupplierVO {
   preferred?: number
   minOrderQty?: number
   remark?: string
-  status?: MaterialSupplierStatus
+  status?: number
 }
 
 export interface MaterialSupplierListResponse extends PageResult<MaterialSupplierVO> {}
@@ -35,6 +35,7 @@ export interface MaterialSupplierCreateRequest {
   leadTimeDays?: number
   preferred?: number
   minOrderQty?: number
+  status?: number
   remark?: string
 }
 

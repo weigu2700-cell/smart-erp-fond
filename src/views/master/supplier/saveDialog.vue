@@ -25,6 +25,7 @@ const form = reactive<SupplierCreateRequest>({
   address: '',
   phone: '',
   email: '',
+  status: 1,
   remark: '',
 })
 
@@ -51,6 +52,7 @@ watch(
       form.address = ''
       form.phone = ''
       form.email = ''
+      form.status = 1
       form.remark = ''
     }
     formRef.value?.clearValidate()

@@ -31,6 +31,7 @@ const form = reactive<MaterialCreateRequest>({
   unit: '',
   spec: '',
   type: 'RAW_MATERIAL',
+  status: 1,
   safetyStock: 0,
   remark: '',
 })
@@ -56,6 +57,7 @@ watch(
       form.unit = ''
       form.spec = ''
       form.type = 'RAW_MATERIAL'
+      form.status = 1
       form.safetyStock = 0
       form.remark = ''
     }

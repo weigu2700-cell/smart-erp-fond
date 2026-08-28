@@ -7,7 +7,7 @@ export interface ProductionLineListRequest {
   pageSize: number
   name?: string | null
   workshopId?: string | null
-  status?: ProductionLineStatus | null
+  status?: number | null
 }
 
 export interface ProductionLineVO {
@@ -17,7 +17,7 @@ export interface ProductionLineVO {
   workshopName?: string
   capacityPerDay?: number
   remark?: string
-  status: ProductionLineStatus
+  status: number
   createTime?: string
 }
 
@@ -26,6 +26,7 @@ export interface ProductionLineListResponse extends PageResult<ProductionLineVO>
 export interface ProductionLineCreateRequest {
   name: string
   workshopId: string
+  status?: number
   capacityPerDay?: number
   remark?: string
 }

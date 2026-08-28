@@ -9,7 +9,7 @@ export interface WorkshopVO {
   factoryId: string
   factoryName?: string
   remark?: string
-  status: WorkshopStatus
+  status: number
 }
 
 export interface WorkshopListRequest {
@@ -18,12 +18,14 @@ export interface WorkshopListRequest {
   name?: string | null
   code?: string | null
   factoryId?: string | null
+  status?: number | null
 }
 
 export interface WorkshopCreateRequest {
   name: string
   factoryId: string
   shortName?: string
+  status?: number
   remark?: string
 }
 
@@ -36,7 +38,7 @@ export interface WorkshopUpdateRequest {
 
 export interface WorkshopStatusChangeRequest {
   id: string
-  status: WorkshopStatus
+  status: number
 }
 
 export interface WorkshopListResponse extends PageResult<WorkshopVO> {}

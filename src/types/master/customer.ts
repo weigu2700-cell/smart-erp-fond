@@ -7,7 +7,7 @@ export interface CustomerListRequest {
   pageSize: number
   name?: string | null
   code?: string | null
-  status?: CustomerStatus | null
+  status?: number | null
 }
 
 export interface CustomerVO {
@@ -21,7 +21,7 @@ export interface CustomerVO {
   phone?: string
   email?: string
   remark?: string
-  status?: CustomerStatus | number
+  status?: number
   createdTime?: string
 }
 
@@ -34,14 +34,15 @@ export interface CustomerCreateRequest {
   address?: string
   phone?: string
   email?: string
+  status?: number
   remark?: string
 }
 
 export interface CustomerUpdateRequest extends CustomerCreateRequest {
   id?: string
-  status?: CustomerStatus
+  status?: number
 }
 
 export interface CustomerStatusChangeRequest {
-  status: CustomerStatus
+  status: number
 }

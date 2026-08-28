@@ -1,229 +1,209 @@
 <script setup lang="ts">
-  import Selector from "@/views/master/material/component/selector.vue";
-  import ProToolbar from "@/components/ProToolbar.vue";
-  import ProTable, {type ProColumn} from "@/components/ProTable.vue"
-  import {onMounted, ref, reactive} from 'vue'
-  import {changeMaterialStatus, createMaterial, getMaterialList, updateMaterial} from "@/api/master/material.ts";
-  import type {
-    MaterialCreateRequest,
-    MaterialListRequest,
-    MaterialListResponse,
-    MaterialUpdateRequest,
-    MaterialVO
-  } from "@/types/master/material.ts";
-  import SaveDialog from "@/views/master/material/saveDialog.vue";
-  import {ElMessage, ElMessageBox} from "element-plus";
+import Selector from "@/views/master/material/component/selector.vue";
+import ProToolbar from "@/components/ProToolbar.vue";
+import ProTable, { type ProColumn } from "@/components/ProTable.vue"
+import { onMounted, ref, reactive } from 'vue'
+import { changeMaterialStatus, createMaterial, getMaterialList, updateMaterial } from "@/api/master/material.ts";
+import type {
+  MaterialCreateRequest,
+  MaterialListRequest,
+  MaterialListResponse,
+  MaterialUpdateRequest,
+  MaterialVO
+} from "@/types/master/material.ts";
+import SaveDialog from "@/views/master/material/saveDialog.vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 
-  const queryData = reactive<MaterialListRequest>({
-    page: 1,
-    pageSize: 10,
-    name: null,
-    code: null,
-    spec: null,
-    type: null,
-    status: null,
-  })
+const queryData = reactive<MaterialListRequest>({
+  page: 1,
+  pageSize: 10,
+  name: null,
+  code: null,
+  spec: null,
+  type: null,
+  status: null,
+})
 
-  const tableData = ref<MaterialListResponse>()
-  const visible = ref(false)
-  const model = ref<'add' | 'edit'>('add')
-  const selectedRowId = ref<string>()
-  const tableRef = ref<{ clearSelection: () => void }>()
+const tableData = ref<MaterialListResponse>()
+const visible = ref(false)
+const model = ref<'add' | 'edit'>('add')
+const selectedRowId = ref<string>()
+const tableRef = ref<{ clearSelection: () => void }>()
 
-  const handleSelectionChange = (rows: MaterialVO[]) => {
-    selectedRowId.value = rows[0] ? String(rows[0].id) : undefined
+const handleSelectionChange = (rows: MaterialVO[]) => {
+  selectedRowId.value = rows[0] ? String(rows[0].id) : undefined
+}
+
+const loadData = async () => {
+  tableData.value = await getMaterialList(queryData)
+}
+
+const columns = ref<ProColumn[]>([
+  { label: '物料编码', prop: 'code', width: 240 },
+  { label: '物料名称', prop: 'name', minWidth: 140 },
+  { label: '规格', prop: 'spec', width: 120 },
+  { label: '类型', prop: 'type', width: 110, slot: 'type' },
+  { label: '单位', prop: 'unit', width: 80 },
+  { label: '安全库存', prop: 'safetyStock', width: 100 },
+  { label: '状态', prop: 'status', width: 90, slot: 'status' },
+  { label: '备注', prop: 'remark', minWidth: 140 },
+])
+
+const typeLabel: Record<string, string> = {
+  RAW_MATERIAL: '原材料',
+  SEMI_FINISHED: '半成品',
+  PACKAGING: '包装材料',
+  CONSUMABLE: '耗材',
+  OTHER: '其他',
+}
+
+const handleQuery = (params: MaterialListRequest) => {
+  Object.assign(queryData, params, { page: 1 })
+  loadData()
+}
+
+const handleReset = () => {
+  queryData.name = null
+  queryData.code = null
+  queryData.spec = null
+  queryData.type = null
+  queryData.status = null
+  queryData.page = 1
+  handleQuery(queryData)
+}
+
+onMounted(() => {
+  loadData()
+})
+
+const handleAdd = () => {
+  model.value = 'add'
+  visible.value = true
+}
+
+const handleEdit = () => {
+  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  if (!row) {
+    ElMessage.warning('请选择要编辑的物料')
+    return
   }
+  model.value = 'edit'
+  visible.value = true
+}
 
-  const loadData = async () => {
-    tableData.value = await getMaterialList(queryData)
+const handleDelete = async () => {
+  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  if (!row) {
+    ElMessage.warning('请选择要删除的物料')
+    return
   }
-
-  const columns = ref<ProColumn[]>([
-    {label: '物料编码', prop: 'code', width: 240},
-    {label: '物料名称', prop: 'name', minWidth: 140},
-    {label: '规格', prop: 'spec', width: 120},
-    {label: '类型', prop: 'type', width: 110, slot: 'type'},
-    {label: '单位', prop: 'unit', width: 80},
-    {label: '安全库存', prop: 'safetyStock', width: 100},
-    {label: '状态', prop: 'status', width: 90, slot: 'status'},
-    {label: '备注', prop: 'remark', minWidth: 140},
-  ])
-
-  const typeLabel: Record<string, string> = {
-    RAW_MATERIAL: '原材料',
-    SEMI_FINISHED: '半成品',
-    PACKAGING: '包装材料',
-    CONSUMABLE: '耗材',
-    OTHER: '其他',
-  }
-
-  const handleQuery = (params: MaterialListRequest) => {
-    Object.assign(queryData, params, {page: 1})
-    loadData()
-  }
-
-  const handleReset = () => {
-    queryData.name = null
-    queryData.code = null
-    queryData.spec = null
-    queryData.type = null
-    queryData.status = null
-    queryData.page = 1
-    handleQuery(queryData)
-  }
-
-  onMounted(() => {
-    loadData()
-  })
-
-  const handleAdd = () => {
-    model.value = 'add'
-    visible.value = true
-  }
-
-  const handleEdit = () => {
-    const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
-    if (!row) {
-      ElMessage.warning('请选择要编辑的物料')
-      return
-    }
-    model.value = 'edit'
-    visible.value = true
-  }
-
-  const handleDelete = async () => {
-    const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
-    if (!row) {
-      ElMessage.warning('请选择要删除的物料')
-      return
-    }
-    try {
-      await ElMessageBox.confirm(
-        `确定要删除物料 ${row.name} 吗？`,
-        '删除确认',
-        {
-          type: 'warning',
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-        }
-      )
-    } catch {
-      return // 用户取消
-    }
-    try {
-      // 物料状态变更 body 是原始字符串
-      await changeMaterialStatus(String(row.id), 'DISABLE')
-      ElMessage.success('删除成功')
-      tableRef.value?.clearSelection()
-      selectedRowId.value = undefined
-      await loadData()
-    } catch {
-      ElMessage.error('删除失败')
-    }
-  }
-
-  const handleRefresh = () => {
-    loadData()
-  }
-
-  const handleSubmit = async (form: MaterialCreateRequest | MaterialUpdateRequest) => {
-    try {
-      if (model.value === 'edit' && selectedRowId.value) {
-        await updateMaterial(selectedRowId.value, form as MaterialUpdateRequest)
-      } else {
-        await createMaterial(form as MaterialCreateRequest)
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除物料 ${row.name} 吗？`,
+      '删除确认',
+      {
+        type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
       }
-      ElMessage.success('保存成功')
-      visible.value = false
-      tableRef.value?.clearSelection()
-      selectedRowId.value = undefined
-      await loadData()
-    } catch {
-      ElMessage.error('保存失败')
-    }
+    )
+  } catch {
+    return // 用户取消
   }
+  try {
+    // 物料状态变更 body 是原始字符串
+    await changeMaterialStatus(String(row.id), 'DISABLE')
+    ElMessage.success('删除成功')
+    tableRef.value?.clearSelection()
+    selectedRowId.value = undefined
+    await loadData()
+  } catch {
+    ElMessage.error('删除失败')
+  }
+}
 
-  const handleCancel = () => {
+const handleRefresh = () => {
+  loadData()
+}
+
+const handleSubmit = async (form: MaterialCreateRequest | MaterialUpdateRequest) => {
+  try {
+    if (model.value === 'edit' && selectedRowId.value) {
+      await updateMaterial(selectedRowId.value, form as MaterialUpdateRequest)
+    } else {
+      await createMaterial(form as MaterialCreateRequest)
+    }
+    ElMessage.success('保存成功')
     visible.value = false
+    tableRef.value?.clearSelection()
+    selectedRowId.value = undefined
+    await loadData()
+  } catch {
+    ElMessage.error('保存失败')
   }
+}
+
+const handleCancel = () => {
+  visible.value = false
+}
 </script>
 
 <template>
-  <div class="material-container">
-    <div class="selector">
-      <Selector
-        :queryData="queryData"
-        @query="handleQuery"
-        @reset="handleReset"
-      />
+  <div class="material-container round">
+    <div class="selector round">
+      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
-    <div class="toolbar">
-      <ProToolbar
-        @add="handleAdd"
-        @edit="handleEdit"
-        @delete="handleDelete"
-        @refresh="handleRefresh"
-      />
+    <div class="toolbar round">
+      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
     </div>
-    <div class="table">
-      <ProTable
-        ref="tableRef"
-        :data="tableData?.records ?? []"
-        :columns="columns"
-        :total="tableData?.total ?? 0"
-        :page="queryData.page"
-        :page-size="queryData.pageSize"
+    <div class="table round">
+      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
+        :page="queryData.page" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange"
-      >
-        <template #type="{row}">
+        @selectionChange="handleSelectionChange">
+        <template #type="{ row }">
           {{ typeLabel[row.type] ?? row.type }}
         </template>
-        <template #status="{row}">
-          <el-tag :type="row.status === 'ENABLE' ? 'success' : 'info'" size="small">
-            {{ row.status === 'ENABLE' ? '启用' : '停用' }}
+        <template #status="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
+            {{ row.status === 1 ? '启用' : '停用' }}
           </el-tag>
         </template>
       </ProTable>
     </div>
   </div>
 
-  <SaveDialog
-    :visible="visible"
-    :title="model=== 'add' ? '新增物料' : '修改物料'"
-    :mode="model"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
-    @cancel="handleCancel"
-    @submit="handleSubmit"
-  />
+  <SaveDialog :visible="visible" :title="model === 'add' ? '新增物料' : '修改物料'" :mode="model"
+    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
+    @submit="handleSubmit" />
 </template>
 
 <style scoped>
-  .material-container {
-    width: 100%;
-    height: 100%;
-    background-color: #f0f2f5;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+.material-container {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  .material-container .selector {
-    width: 100%;
-    background: #ffffff;
-    border: 1px solid #e4e7ed;
-  }
+.material-container .selector {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+}
 
-  .material-container .toolbar {
-    width: 100%;
-    background: #ffffff;
-    border: 1px solid #e4e7ed;
-  }
+.material-container .toolbar {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+}
 
-  .material-container .table {
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-  }
+.material-container .table {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
 </style>

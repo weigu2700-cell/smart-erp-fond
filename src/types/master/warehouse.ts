@@ -10,7 +10,7 @@ export interface WarehouseListRequest {
   code?: string | null
   factoryId?: string | null
   type?: WarehouseType | null
-  status?: WarehouseStatus | null
+  status?: number | null
 }
 
 export interface WarehouseVO {
@@ -22,7 +22,7 @@ export interface WarehouseVO {
   remark?: string
   factoryId: string
   factoryName?: string
-  status?: WarehouseStatus
+  status?: number
 }
 
 export interface WarehouseListResponse extends PageResult<WarehouseVO> {}
@@ -31,6 +31,7 @@ export interface WarehouseCreateRequest {
   name: string
   type: WarehouseType
   factoryId: string
+  status?: number
   address?: string
   remark?: string
 }
@@ -42,5 +43,5 @@ export interface WarehouseUpdateRequest {
 }
 
 export interface WarehouseStatusChangeRequest {
-  status: WarehouseStatus
+  status: number
 }

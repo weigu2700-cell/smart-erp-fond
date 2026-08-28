@@ -10,7 +10,7 @@ export interface MaterialListRequest {
   code?: string | null
   spec?: string | null
   type?: string | null
-  status?: string | null
+  status?: number | null
 }
 
 export interface MaterialVO {
@@ -19,7 +19,7 @@ export interface MaterialVO {
   name: string
   spec?: string
   type?: string
-  status?: string
+  status?: number
   unit?: string
   safetyStock?: number
   remark?: string
@@ -32,6 +32,7 @@ export interface MaterialCreateRequest {
   unit?: string
   spec?: string
   type: MaterialType
+  status?: number
   safetyStock?: number
   remark?: string
 }
