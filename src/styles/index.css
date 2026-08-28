@@ -10,6 +10,7 @@
   /* 布局尺寸 */
   --aside-width: 200px;
   --header-height: 50px;
+  --aside-collapse-width: 64px;
 
   /* 覆盖 Element Plus 主题色 */
   --el-color-primary: #1890ff;
