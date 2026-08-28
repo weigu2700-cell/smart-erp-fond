@@ -4,6 +4,8 @@
 
 项目名称：**原点 ERP · ORIGIN**。原点代表主数据、流程和业务协作的统一起点。
 
+前端仓库：[weigu2700-cell/ORIGIN-ERP--FrontEnd](https://github.com/weigu2700-cell/ORIGIN-ERP--FrontEnd)
+
 配套后端：Spring Boot + Spring Security + JWT + MyBatis-Plus + MySQL，后端仓库见 [weigu2700-cell/smart-erp](https://github.com/weigu2700-cell/smart-erp)。
 
 ## 技术栈
