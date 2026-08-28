@@ -1,4 +1,4 @@
-# SmartERP Frontend
+# 原点 ERP · ORIGIN
 
 基于 Vue 3 + TypeScript + Vite + Element Plus 的企业级 ERP 管理系统前端，采用前后端分离架构，实现了基于 RBAC 的权限控制体系。
 

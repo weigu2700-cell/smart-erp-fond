@@ -53,35 +53,58 @@ const shouldCollapse = computed(() => props.depth === 0 && appStore.isFold)
 
 <style scoped>
 .el-scrollbar {
-  height: calc(100% - 60px);
-  background-color: #304156;
+  flex: 1;
+  min-height: 0;
+  background-color: #ffffff;
 }
 
 :deep(.el-menu) {
   border-right: none;
-  background-color: #304156;
+  background-color: #ffffff;
 }
 
 :deep(.el-menu-item),
 :deep(.el-sub-menu__title) {
   height: 50px;
   line-height: 50px;
-  color: #bfcbd9;
+  color: #5f6368;
+  margin: 3px 12px;
+  border-radius: 8px;
 }
 
 :deep(.el-menu-item:hover),
 :deep(.el-sub-menu__title:hover) {
-  background-color: #263445;
-  color: #ffffff;
+  background-color: #f1f3f4;
+  color: #202124;
 }
 
 :deep(.el-menu-item.is-active),
 :deep(.el-menu-item.is-active:hover) {
-  background-color: var(--el-color-primary);
-  color: #ffffff;
+  background: #e8f0fe;
+  color: #1967d2;
+  box-shadow: none;
 }
 
 :deep(.el-sub-menu .el-menu) {
-  background-color: #1f2d3d;
+  background-color: #f8fafd;
+}
+
+:deep(.el-sub-menu .el-menu-item) {
+  min-width: 0;
+  padding-left: 54px !important;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+:deep(.el-menu--collapse) {
+  width: var(--aside-collapse-width);
+}
+
+:deep(.el-menu--collapse .el-menu-item),
+:deep(.el-menu--collapse .el-sub-menu__title) {
+  margin-left: 8px;
+  margin-right: 8px;
+  padding: 0 !important;
+  justify-content: center;
 }
 </style>

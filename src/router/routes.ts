@@ -85,7 +85,7 @@ export function generateRoutes(menus: MenuItem[]): RouteRecordRaw[] {
       path: menu.path,
       name: menu.name,
       meta: {title: menu.title},
-      children: hasChildren ? generateRoutes(menu.children) : []
+      children: hasChildren ? generateRoutes(menu.children ?? []) : []
     }
     if (component) {
       route.component = component

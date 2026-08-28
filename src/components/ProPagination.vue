@@ -80,7 +80,8 @@
     align-items: center;
     padding: 10px;
     gap: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-panel);
     background: #ffffff;
     font-size: 13px;
     color: #606266;
@@ -116,8 +117,8 @@
   }
 
   .pro-pagination .pg-btn:hover:not(:disabled):not(.pg-active) {
-    color: #1890ff;
-    border-color: #1890ff;
+    color: var(--el-color-primary);
+    border-color: var(--el-color-primary);
   }
 
   .pro-pagination .pg-btn:disabled {
@@ -126,8 +127,8 @@
   }
 
   .pro-pagination .pg-btn.pg-active {
-    background: #1890ff;
-    border-color: #1890ff;
+    background: var(--el-color-primary);
+    border-color: var(--el-color-primary);
     color: #fff;
   }
 

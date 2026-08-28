@@ -123,7 +123,8 @@
 
     .pro-table {
       flex: 1;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-panel);
     }
   }
 </style>

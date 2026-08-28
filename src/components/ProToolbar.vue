@@ -54,8 +54,9 @@
 <style scoped>
   .pro-toolbar-container {
     width: 100%;
-    height: 60px;
-    padding: 0 16px;
+    min-height: 56px;
+    height: auto;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -68,7 +69,7 @@
   .pro-toolbar-container .pro-toolbar-btn {
     height: 34px;
     padding: 0 16px;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
     border: none;
     transition: all .2s ease;
@@ -79,15 +80,15 @@
     margin-right: 2px;
   }
 
-  /* 新增：主操作，主色渐变实心 + 柔和阴影，层次分明 */
+  /* 主操作使用 Material 风格的纯色按钮，避免工具栏过度装饰 */
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--add {
-    background: linear-gradient(135deg, var(--el-color-primary), var(--el-color-primary-light-3));
-    box-shadow: 0 2px 6px rgba(64, 158, 255, 0.25);
+    background: var(--el-color-primary);
+    box-shadow: none;
   }
 
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--add:hover,
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--add:focus {
-    background: linear-gradient(135deg, var(--el-color-primary-light-1), var(--el-color-primary-light-3));
+    background: var(--el-color-primary-dark-2);
   }
 
   /* 修改：浅琥珀底 + 琥珀字 */

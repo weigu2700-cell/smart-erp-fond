@@ -6,15 +6,14 @@
 
   const breadcrumbList = computed(() =>
     route.matched
-      .map(item => item)
-      .filter((title) => Boolean(title))
+      .filter(item => Boolean(item.meta.title))
   )
 </script>
 
 <template>
   <div>
     <el-breadcrumb separator="/">
-      <el-breadcrumb-item v-for="(item, index) in breadcrumbList" :key="index" :to="item.path">
+      <el-breadcrumb-item v-for="(item, index) in breadcrumbList" :key="index" :to="index < breadcrumbList.length - 1 ? item.path : undefined">
         {{item.meta.title}}
       </el-breadcrumb-item>
     </el-breadcrumb>

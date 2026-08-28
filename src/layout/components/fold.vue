@@ -23,14 +23,24 @@ const toggleCollapse = () => {
 <style scoped>
 .fold {
   width: 100%;
-  height: 60px;
+  height: 56px;
+  flex: 0 0 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
+  padding: 0 16px;
 }
 
 .fold .el-button {
   width: 100%;
+  height: 34px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  color: #5f6368;
+}
+
+.fold .el-button:hover {
+  background: #f1f3f4;
+  color: #202124;
 }
 </style>

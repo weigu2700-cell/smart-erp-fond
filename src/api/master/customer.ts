@@ -27,5 +27,5 @@ export function updateCustomer(data: CustomerUpdateRequest) {
 }
 
 export function changeCustomerStatus(id: string, status: CustomerStatus) {
-  return service.put<void>(`master/customer/${id}/status`, {status} as CustomerStatusChangeRequest)
+  return service.put<void>(`master/customer/${id}/status`, {status} as unknown as CustomerStatusChangeRequest)
 }

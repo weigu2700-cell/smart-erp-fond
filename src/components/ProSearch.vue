@@ -26,13 +26,15 @@
   .pro-search {
     height: 100%;
     width: 100%;
+    min-height: 64px;
     padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 16px;
     background: #ffffff;
     border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-panel);
     box-sizing: border-box;
 
     .pro-search__form {
