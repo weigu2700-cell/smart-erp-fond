@@ -96,7 +96,6 @@ const handleRefresh = () => {
 .transaction-container {
   width: 100%;
   height: 100%;
-  background-color: #f0f2f5;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -105,13 +104,11 @@ const handleRefresh = () => {
 .transaction-container .selector {
   width: 100%;
   background: #ffffff;
-  border: 1px solid #e4e7ed;
 }
 
 .transaction-container .toolbar {
   width: 100%;
   background: #ffffff;
-  border: 1px solid #e4e7ed;
 }
 
 .transaction-container .table {

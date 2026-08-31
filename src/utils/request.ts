@@ -35,7 +35,6 @@ http.interceptors.response.use(
     const result = response.data
 
     if (result.code !== 200) {
-      ElMessage.error(result.message)
       return Promise.reject(new Error(result.message))
     }
     return result.data
@@ -47,7 +46,7 @@ http.interceptors.response.use(
         ElMessage.error('登录过期，请重新登录')
         break
       case 403:
-        ElMessage.error('无权访问')
+        console.error('无权访问')
         break
       case 404:
         ElMessage.error('请求的资源不存在')

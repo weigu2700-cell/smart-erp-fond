@@ -38,7 +38,7 @@ const queryData = reactive<PermissionListRequest>({
 
 const columns: ProColumn[] = [
   { label: '权限名称', prop: 'name', width: 180, fixed: 'left' },
-  { label: '权限编码', prop: 'code', width: 180 },
+  { label: '权限编码', prop: 'code', width: 260 },
   { label: '类型', prop: 'type', width: 100, slot: 'type' },
   { label: '排序', prop: 'sort', width: 100 },
   { label: '状态', prop: 'status', width: 100, slot: 'status' },

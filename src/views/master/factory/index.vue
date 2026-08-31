@@ -168,7 +168,6 @@ const handleCancel = () => {
 .factory-container {
   width: 100%;
   height: 100%;
-  background-color: #f0f2f5;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -177,13 +176,11 @@ const handleCancel = () => {
 .factory-container .selector {
   width: 100%;
   background: #ffffff;
-  border: 1px solid #e4e7ed;
 }
 
 .factory-container .toolbar {
   width: 100%;
   background: #ffffff;
-  border: 1px solid #e4e7ed;
 }
 
 .factory-container .table {
