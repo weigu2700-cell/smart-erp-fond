@@ -2,6 +2,7 @@
 import EntityDetailDialog, { type DetailField } from '@/components/EntityDetailDialog.vue'
 import type { SupplierVO } from '@/types/master/supplier'
 import { computed } from 'vue'
+
 const props = defineProps<{
   visible: boolean;
   row?: SupplierVO | null

@@ -30,7 +30,8 @@ const handleClose = () => emit('cancel')
 <template>
   <el-dialog :model-value="props.visible" :title="props.title" width="680px" align-center @close="handleClose">
     <el-descriptions v-if="props.row" :column="2" border>
-      <el-descriptions-item v-for="field in displayFields" :key="field.label" :label="field.label" :span="field.span ?? 1">
+      <el-descriptions-item v-for="field in displayFields" :key="field.label" :label="field.label"
+        :span="field.span ?? 1">
         {{ formatValue(field.value) }}
       </el-descriptions-item>
     </el-descriptions>

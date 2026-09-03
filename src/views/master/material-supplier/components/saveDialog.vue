@@ -5,6 +5,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import MaterialRefer from "@/selector/MaterialRefer.vue";
 import SupplierRefer from "@/selector/SupplierRefer.vue";
 import type { MaterialSupplierCreateRequest, MaterialSupplierUpdateRequest, MaterialSupplierVO } from "@/types/master/materialSupplier.ts";
+import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 
 const props = defineProps<{
   visible: boolean
@@ -103,7 +104,7 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" width="520px" align-center>
+  <BaseSaveDialog :visible="props.visible" :title="title" width="520px" @cancel="handleCancel" @submit="handleSubmit">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
       <!-- 编辑模式下后端不支持修改物料/供应商，仅新增展示 -->
       <template v-if="mode === 'add'">
@@ -136,11 +137,7 @@ const handleCancel = () => {
         <el-input v-model="form.remark" type="textarea" :rows="2" placeholder="请输入备注" />
       </el-form-item>
     </el-form>
-    <template #footer>
-      <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-    </template>
-  </el-dialog>
+  </BaseSaveDialog>
 </template>
 
 <style scoped></style>

@@ -12,7 +12,7 @@
   import ProToolbar from "@/components/ProToolbar.vue";
   import SaveDialog from "@/views/system/user/components/saveDialog.vue";
   import AssignDialog from "@/views/system/user/assignDialog.vue";
-  import Selector from "@/views/system/user/component/selector.vue";
+  import Selector from "@/views/system/user/components/selector.vue";
   import type {createUserRequest, updateUserRequest} from "@/types/system/user.ts";
 
   const tableData = ref<getUserListResponse>()

@@ -6,6 +6,7 @@ import type { PostSaleDelivery, PostSaleDeliveryItem } from '@/types/sales/sales
 import SalesOrderRefer from '@/selector/SalesOrderRefer.vue';
 import WarehouseRefer from '@/selector/WarehouseRefer.vue';
 import MaterialRefer from '@/selector/MaterialRefer.vue';
+import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
 
 const props = defineProps<{
   visible: boolean
@@ -71,7 +72,7 @@ watch(() => props.visible, (val) => {
 </script>
 
 <template>
-  <el-dialog :model-value="props.visible" :title="props.title ?? '新增销售交货单'" width="900px" @close="handleCancel">
+  <BaseSaveDialog :visible="props.visible" :title="props.title ?? '新增销售交货单'" width="900px" @cancel="handleCancel" @submit="handleSubmit">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -121,11 +122,7 @@ watch(() => props.visible, (val) => {
         </el-table-column>
       </el-table>
     </el-form>
-    <template #footer>
-      <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-    </template>
-  </el-dialog>
+  </BaseSaveDialog>
 </template>
 
 <style scoped></style>

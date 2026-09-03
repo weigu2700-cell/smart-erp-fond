@@ -3,6 +3,7 @@ import { reactive, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import type { SupplierCreateRequest, SupplierUpdateRequest, SupplierVO } from "@/types/master/supplier.ts";
+import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 
 const props = defineProps<{
   visible: boolean
@@ -83,7 +84,7 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" width="520px" align-center>
+  <BaseSaveDialog :visible="props.visible" :title="title" width="520px" @cancel="handleCancel" @submit="handleSubmit">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
       <el-form-item label="供应商名称" prop="name">
         <el-input v-model="form.name" placeholder="请输入供应商名称" clearable />
@@ -107,11 +108,7 @@ const handleCancel = () => {
         <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入备注" />
       </el-form-item>
     </el-form>
-    <template #footer>
-      <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-    </template>
-  </el-dialog>
+  </BaseSaveDialog>
 </template>
 
 <style scoped></style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Selector from "@/views/inventory/transaction/component/selector.vue";
+import Selector from "@/views/inventory/transaction/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'

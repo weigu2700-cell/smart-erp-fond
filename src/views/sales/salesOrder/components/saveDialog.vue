@@ -6,6 +6,7 @@ import type { PostOrPutSalesOrder, PostOrPutSalesOrderItem, SalesOrderVo } from 
 import CustomerRefer from '@/selector/CustomerRefer.vue';
 import MaterialRefer from '@/selector/MaterialRefer.vue';
 import WarehouseRefer from '@/selector/WarehouseRefer.vue';
+import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
 
 const props = defineProps<{
   visible: boolean
@@ -109,8 +110,8 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <el-dialog :model-value="props.visible" :title="props.title ?? (props.mode === 'edit' ? '修改销售订单' : '新增销售订单')"
-    width="1000px" @close="handleCancel">
+  <BaseSaveDialog :visible="props.visible" :title="props.title ?? (props.mode === 'edit' ? '修改销售订单' : '新增销售订单')"
+    width="1000px" @cancel="handleCancel" @submit="handleSubmit">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-row :gutter="20">
         <el-col :span="8">
@@ -177,11 +178,7 @@ const handleCancel = () => {
       </el-table>
     </el-form>
 
-    <template #footer>
-      <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-    </template>
-  </el-dialog>
+  </BaseSaveDialog>
 </template>
 
 <style scoped></style>

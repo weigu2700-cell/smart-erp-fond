@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import {reactive, ref} from "vue";
-  import ParentDeptSelector from "@/views/system/dept/component/parentDeptSelector.vue";
+  import ParentDeptSelector from "@/views/system/dept/components/parentDeptSelector.vue";
   import {CircleClose, Search} from "@element-plus/icons-vue";
   import type {getUserListRequest} from "@/types/system/user.ts";
   import ProSearch from "@/components/ProSearch.vue";

@@ -4,7 +4,7 @@ import { ElMessage } from "element-plus";
 import type { deptResponse, deptRequest, deptColumns, saveDeptRequest, deptTree } from "@/types/system/dept.ts";
 import { getDeptList, getDeptTree, saveDept, updateDept } from "@/api/system/dept.ts";
 import SaveDialog from "@/views/system/dept/components/saveDialog.vue";
-import Selector from "@/views/system/dept/component/selector.vue";
+import Selector from "@/views/system/dept/components/selector.vue";
 import ProTable from "@/components/ProTable.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTree from "@/components/ProTree.vue";

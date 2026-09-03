@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import Selector from "@/views/master/workshop/component/selector.vue";
+import Selector from "@/views/master/workshop/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { getWorkshopList, createWorkshop, updateWorkshop, changeWorkshopStatus } from "@/api/master/workshop.ts";

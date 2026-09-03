@@ -3,7 +3,8 @@
   import type {FormInstance, FormRules} from "element-plus";
   import {CircleClose, Search} from "@element-plus/icons-vue";
   import type {createUserRequest} from "@/types/system/user.ts";
-  import ParentDeptSelector from "@/views/system/dept/component/parentDeptSelector.vue";
+  import ParentDeptSelector from "@/views/system/dept/components/parentDeptSelector.vue";
+  import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 
   type EditRow = createUserRequest & {id?: string, deptName?: string}
 
@@ -93,11 +94,12 @@
 </script>
 
 <template>
-  <el-dialog
-    :model-value="props.visible"
+  <BaseSaveDialog
+    :visible="props.visible"
     :title="props.title ?? (props.mode === 'edit' ? '修改用户' : '新增用户')"
     width="600px"
-    @close="handleCancel"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
   >
     <el-form
       ref="formRef"
@@ -173,16 +175,11 @@
         </el-col>
       </el-row>
     </el-form>
-    <template #footer>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-      <el-button @click="handleCancel">取消</el-button>
-    </template>
-
     <ParentDeptSelector
       v-model:visible="deptSelectorVisible"
       @select="handleDeptSelect"
     />
-  </el-dialog>
+  </BaseSaveDialog>
 </template>
 
 <style scoped>

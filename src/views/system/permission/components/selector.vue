@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {reactive, ref} from "vue";
   import ProSearch from "@/components/ProSearch.vue";
-  import ParentPermissionSelector from "@/views/system/permission/component/parentPermissionSelector.vue";
+  import ParentPermissionSelector from "@/views/system/permission/components/parentPermissionSelector.vue";
   import {CircleClose, Search} from "@element-plus/icons-vue";
   import type {PermissionListRequest, PermissionType, PermissionStatus} from "@/types/system/permission.ts";
 

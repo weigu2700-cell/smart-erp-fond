@@ -2,6 +2,7 @@
   import {reactive, ref, watch} from "vue";
   import type {FormInstance, FormRules} from "element-plus";
   import type {RoleSaveRequest} from "@/types/system/role.ts";
+  import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 
   type EditRow = RoleSaveRequest
 
@@ -59,11 +60,12 @@
 </script>
 
 <template>
-  <el-dialog
-    :model-value="props.visible"
+  <BaseSaveDialog
+    :visible="props.visible"
     :title="props.title ?? (props.mode === 'edit' ? '修改角色' : '新增角色')"
     width="500px"
-    @close="handleCancel"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
   >
     <el-form
       ref="formRef"
@@ -84,9 +86,5 @@
         </el-select>
       </el-form-item>
     </el-form>
-    <template #footer>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-      <el-button @click="handleCancel">取消</el-button>
-    </template>
-  </el-dialog>
+  </BaseSaveDialog>
 </template>

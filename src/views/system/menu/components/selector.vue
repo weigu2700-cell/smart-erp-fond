@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {reactive, ref} from "vue";
   import ProSearch from "@/components/ProSearch.vue";
-  import ParentMenuSelector from "@/views/system/menu/component/parentMenuSelector.vue";
+  import ParentMenuSelector from "@/views/system/menu/components/parentMenuSelector.vue";
   import {CircleClose, Search} from "@element-plus/icons-vue";
   import type {MenuListRequest, MenuStatus} from "@/types/system/menu.ts";
 

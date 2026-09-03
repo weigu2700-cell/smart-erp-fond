@@ -5,6 +5,7 @@
   import MaterialRefer from "@/selector/MaterialRefer.vue";
   import WarehouseRefer from "@/selector/WarehouseRefer.vue";
   import type {MaterialStockCreateRequest} from "@/types/inventory/materialStock.ts";
+  import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 
   const props = defineProps<{
     visible: boolean
@@ -62,11 +63,12 @@
 </script>
 
 <template>
-  <el-dialog
-    v-model="dialogVisible"
+  <BaseSaveDialog
+    :visible="visible"
     :title="title"
     width="480px"
-    align-center
+    @cancel="handleCancel"
+    @submit="handleSubmit"
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
       <el-form-item label="物料" prop="materialId">
@@ -76,11 +78,7 @@
         <WarehouseRefer v-model="form.warehouseId" />
       </el-form-item>
     </el-form>
-    <template #footer>
-      <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-    </template>
-  </el-dialog>
+  </BaseSaveDialog>
 </template>
 
 <style scoped>

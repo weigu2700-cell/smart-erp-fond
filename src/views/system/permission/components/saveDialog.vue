@@ -3,7 +3,8 @@
   import type {FormInstance, FormRules} from "element-plus";
   import {CircleClose, Search} from "@element-plus/icons-vue";
   import type {PermissionSaveRequest} from "@/types/system/permission.ts";
-  import ParentPermissionSelector from "@/views/system/permission/component/parentPermissionSelector.vue";
+  import ParentPermissionSelector from "@/views/system/permission/components/parentPermissionSelector.vue";
+  import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 
   type EditRow = PermissionSaveRequest & {parentName?: string}
 
@@ -87,11 +88,12 @@
 </script>
 
 <template>
-  <el-dialog
-    :model-value="props.visible"
+  <BaseSaveDialog
+    :visible="props.visible"
     :title="props.title ?? (props.mode === 'edit' ? '修改权限' : '新增权限')"
     width="500px"
-    @close="handleCancel"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
   >
     <el-form
       ref="formRef"
@@ -141,16 +143,11 @@
         <el-input v-model="form.remark" type="textarea" :rows="2" placeholder="请输入备注" clearable />
       </el-form-item>
     </el-form>
-    <template #footer>
-      <el-button type="primary" @click="handleSubmit">保存</el-button>
-      <el-button @click="handleCancel">取消</el-button>
-    </template>
-
     <ParentPermissionSelector
       v-model:visible="parentSelectorVisible"
       @select="handleParentSelect"
     />
-  </el-dialog>
+  </BaseSaveDialog>
 </template>
 
 <style scoped>
