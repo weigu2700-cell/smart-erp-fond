@@ -30,6 +30,7 @@
     (e: 'update:page', page: number): void
     (e: 'update:pageSize', size: number): void
     (e: 'selectionChange', rows: T[]): void
+    (e: 'rowDblclick', row: T): void
   }>()
 
   const handleSelectionChange = (rows: T[]) => emit('selectionChange', rows)
@@ -84,6 +85,7 @@
       style="width: 100%"
       class="pro-table round"
       @selection-change="handleSelectionChange"
+      @row-dblclick="(row: T) => emit('rowDblclick', row)"
     >
       <el-table-column v-if="props.showSelection" type="selection" width="55" />
       <el-table-column

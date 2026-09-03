@@ -32,6 +32,10 @@ http.interceptors.request.use(
 
 http.interceptors.response.use(
   (response) => {
+    // 文件下载接口返回二进制内容，不经过统一的 JSON Result 解包。
+    if (response.config.responseType === 'blob' || response.config.responseType === 'arraybuffer') {
+      return response.data
+    }
     const result = response.data
 
     if (result.code !== 200) {

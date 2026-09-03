@@ -5,7 +5,7 @@ import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue";
 import ProTree from "@/components/ProTree.vue";
 import Selector from "@/views/system/permission/component/selector.vue";
-import SaveDialog from "@/views/system/permission/saveDialog.vue";
+import SaveDialog from "@/views/system/permission/components/saveDialog.vue";
 import {
   getPermissionList,
   getPermissionTree,

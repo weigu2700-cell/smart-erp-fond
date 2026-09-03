@@ -10,7 +10,8 @@ import type {
   FactoryListResponse,
   FactoryVO
 } from "@/types/master/factory.ts";
-import SaveDialog from "@/views/master/factory/saveDialog.vue";
+import SaveDialog from "@/views/master/factory/components/saveDialog.vue";
+import DetailDialog from "@/views/master/factory/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 
 const queryData = reactive<FactoryListRequest>({
@@ -23,6 +24,7 @@ const queryData = reactive<FactoryListRequest>({
 
 const tableData = ref<FactoryListResponse>()
 const visible = ref(false)
+const detailVisible = ref(false)
 const model = ref<'add' | 'edit'>('add')
 const selectedRowId = ref<string>()
 const tableRef = ref<{ clearSelection: () => void }>()
@@ -80,16 +82,18 @@ const handleEdit = () => {
   visible.value = true
 }
 
-const handleDelete = async () => {
+const handleStatus = async () => {
   const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
   if (!row) {
-    ElMessage.warning('请选择要删除的工厂')
+    ElMessage.warning('请选择要切换状态的工厂')
     return
   }
+  const target = row.status === 1 ? 'DISABLE' : 'ENABLE'
+  const action = target === 'ENABLE' ? '启用' : '停用'
   try {
     await ElMessageBox.confirm(
-      `确定要删除工厂 ${row.name} 吗？`,
-      '删除确认',
+      `确定要${action}工厂 ${row.name} 吗？`,
+      '状态确认',
       {
         type: 'warning',
         confirmButtonText: '确定',
@@ -100,18 +104,23 @@ const handleDelete = async () => {
     return // 用户取消
   }
   try {
-    await changeFactoryStatus({ id: row.id, status: 'DISABLE' })
-    ElMessage.success('删除成功')
+    await changeFactoryStatus({ id: row.id, status: target })
+    ElMessage.success(`${action}成功`)
     tableRef.value?.clearSelection()
     selectedRowId.value = undefined
     await loadData()
   } catch {
-    ElMessage.error('删除失败')
+    ElMessage.error(`${action}失败`)
   }
 }
 
 const handleRefresh = () => {
   loadData()
+}
+
+const handleRowDblclick = (row: FactoryVO) => {
+  detailVisible.value = true
+  selectedRowId.value = String(row.id)
 }
 
 const handleSubmit = async (form: addOrUpdateFactoryRequest) => {
@@ -142,14 +151,14 @@ const handleCancel = () => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
     <div class="toolbar round">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange">
+        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
         <template #status="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
             {{ row.status === 1 ? '启用' : '停用' }}
@@ -162,6 +171,9 @@ const handleCancel = () => {
   <SaveDialog :visible="visible" :title="model === 'add' ? '新增工厂' : '修改工厂'" :mode="model"
     :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
     @submit="handleSubmit" />
+  <DetailDialog :visible="detailVisible"
+    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false" />
 </template>
 
 <style scoped>

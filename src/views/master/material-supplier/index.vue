@@ -11,7 +11,8 @@ import type {
   MaterialSupplierUpdateRequest,
   MaterialSupplierVO
 } from "@/types/master/materialSupplier.ts";
-import SaveDialog from "@/views/master/material-supplier/saveDialog.vue";
+import SaveDialog from "@/views/master/material-supplier/components/saveDialog.vue";
+import DetailDialog from "@/views/master/material-supplier/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 
 const queryData = reactive<MaterialSupplierListRequest>({
@@ -25,6 +26,7 @@ const queryData = reactive<MaterialSupplierListRequest>({
 
 const tableData = ref<MaterialSupplierListResponse>()
 const visible = ref(false)
+const detailVisible = ref(false)
 const model = ref<'add' | 'edit'>('add')
 const selectedRowId = ref<string>()
 const tableRef = ref<{ clearSelection: () => void }>()
@@ -81,16 +83,17 @@ const handleEdit = () => {
   visible.value = true
 }
 
-const handleDelete = async () => {
+const handleStatus = async () => {
   const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
   if (!row) {
-    ElMessage.warning('请选择要删除的关联记录')
+    ElMessage.warning('请选择要切换状态的关联记录')
     return
   }
+  const action = row.status === 1 ? '停用' : '启用'
   try {
     await ElMessageBox.confirm(
-      `确定要删除物料「${row.materialName ?? ''}」与供应商「${row.supplierName ?? ''}」的关联吗？`,
-      '删除确认',
+      `确定要${action}物料「${row.materialName ?? ''}」与供应商「${row.supplierName ?? ''}」的关联吗？`,
+      '状态确认',
       {
         type: 'warning',
         confirmButtonText: '确定',
@@ -101,19 +104,24 @@ const handleDelete = async () => {
     return // 用户取消
   }
   try {
-    // 物料供应商状态变更接口无 body
+    // 物料供应商状态接口内部按当前状态切换
     await changeMaterialSupplierStatus(String(row.id))
-    ElMessage.success('删除成功')
+    ElMessage.success(`${action}成功`)
     tableRef.value?.clearSelection()
     selectedRowId.value = undefined
     await loadData()
   } catch {
-    ElMessage.error('删除失败')
+    ElMessage.error(`${action}失败`)
   }
 }
 
 const handleRefresh = () => {
   loadData()
+}
+
+const handleRowDblclick = (row: MaterialSupplierVO) => {
+  detailVisible.value = true
+  selectedRowId.value = String(row.id)
 }
 
 const handleSubmit = async (form: MaterialSupplierCreateRequest | MaterialSupplierUpdateRequest) => {
@@ -144,14 +152,14 @@ const handleCancel = () => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
     <div class="toolbar round">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange">
+        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
         <template #preferred="{ row }">
           <el-tag :type="row.preferred === 1 ? 'warning' : 'info'" size="small">
             {{ row.preferred === 1 ? '优选' : '普通' }}
@@ -169,6 +177,9 @@ const handleCancel = () => {
   <SaveDialog :visible="visible" :title="model === 'add' ? '新增物料供应商' : '修改物料供应商'" :mode="model"
     :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
     @submit="handleSubmit" />
+  <DetailDialog :visible="detailVisible"
+    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false" />
 </template>
 
 <style scoped>

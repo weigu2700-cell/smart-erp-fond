@@ -1,16 +1,22 @@
 <script setup lang="ts">
-  import {Delete, Download, Edit, Plus, Refresh} from "@element-plus/icons-vue";
+  import {Delete, Download, Edit, Plus, Refresh, Switch, Upload} from "@element-plus/icons-vue";
 
   const props = withDefaults(defineProps<{
     showAdd?: boolean
     showEdit?: boolean
     showDelete?: boolean
+    showStatus?: boolean
+    statusLabel?: string
+    showImport?: boolean
     showExport?: boolean
     showRefresh?: boolean
   }>(), {
     showAdd: true,
     showEdit: true,
     showDelete: true,
+    showStatus: false,
+    statusLabel: '切换状态',
+    showImport: false,
     showExport: true,
     showRefresh: true,
   })
@@ -19,6 +25,8 @@
     (e: 'add'): void
     (e: 'edit'): void
     (e: 'delete'): void
+    (e: 'status'): void
+    (e: 'import'): void
     (e: 'export'): void
     (e: 'refresh'): void
   }>()
@@ -32,7 +40,7 @@
         新增
       </el-button>
     </div>
-    <span v-if="props.showAdd && (props.showEdit || props.showDelete || props.showExport || props.showRefresh)" class="pro-toolbar-divider" />
+    <span v-if="props.showAdd && (props.showEdit || props.showDelete || props.showStatus || props.showExport || props.showRefresh)" class="pro-toolbar-divider" />
     <div class="pro-toolbar-secondary">
       <el-button v-if="props.showEdit" text class="pro-toolbar-btn" @click="emit('edit')">
         <template #icon><Edit /></template>
@@ -41,6 +49,14 @@
       <el-button v-if="props.showDelete" text class="pro-toolbar-btn pro-toolbar-btn--delete" @click="emit('delete')">
         <template #icon><Delete /></template>
         删除
+      </el-button>
+      <el-button v-if="props.showStatus" text class="pro-toolbar-btn pro-toolbar-btn--status" @click="emit('status')">
+        <template #icon><Switch /></template>
+        {{ props.statusLabel }}
+      </el-button>
+      <el-button v-if="props.showImport" text class="pro-toolbar-btn" @click="emit('import')">
+        <template #icon><Upload /></template>
+        导入
       </el-button>
       <el-button v-if="props.showExport" text class="pro-toolbar-btn" @click="emit('export')">
         <template #icon><Download /></template>
@@ -130,6 +146,16 @@
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--delete:focus-visible {
     background: #fef3f2;
     color: #a11b12;
+  }
+
+  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--status {
+    color: var(--el-color-primary);
+  }
+
+  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--status:hover,
+  .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--status:focus-visible {
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary-dark-2);
   }
 
   .pro-toolbar-container .pro-toolbar-btn.pro-toolbar-btn--icon {

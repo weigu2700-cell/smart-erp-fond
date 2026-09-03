@@ -5,7 +5,7 @@ import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue";
 import ProTree from "@/components/ProTree.vue";
 import Selector from "@/views/system/menu/component/selector.vue";
-import SaveDialog from "@/views/system/menu/saveDialog.vue";
+import SaveDialog from "@/views/system/menu/components/saveDialog.vue";
 import {
   getMenuList,
   getCurrentUserMenu,

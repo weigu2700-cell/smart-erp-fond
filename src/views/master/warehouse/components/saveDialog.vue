@@ -31,7 +31,7 @@ const form = reactive<WarehouseCreateRequest>({
   name: '',
   type: 'FINISHED',
   factoryId: '',
-  status: 1,
+  status: 'ENABLE',
   address: '',
   remark: '',
 })
@@ -56,7 +56,7 @@ watch(
       form.name = ''
       form.type = 'FINISHED'
       form.factoryId = ''
-      form.status = 1
+      form.status = 'ENABLE'
       form.address = ''
       form.remark = ''
     }

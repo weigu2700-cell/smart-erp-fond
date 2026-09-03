@@ -26,5 +26,5 @@ export function updateWarehouse(id: string, data: WarehouseUpdateRequest) {
 }
 
 export function changeWarehouseStatus(id: string, status: WarehouseStatus) {
-  return service.put<void>(`master/warehouse/${id}/status`, {status} as unknown as WarehouseStatusChangeRequest)
+  return service.put<void>(`master/warehouse/${id}/status`, {status} as WarehouseStatusChangeRequest)
 }

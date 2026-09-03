@@ -4,7 +4,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue";
 import Selector from "@/views/system/role/component/selector.vue";
-import SaveDialog from "@/views/system/role/saveDialog.vue";
+import SaveDialog from "@/views/system/role/components/saveDialog.vue";
 import AssignDialog from "@/views/system/role/assignDialog.vue";
 import {
   getRoleList,

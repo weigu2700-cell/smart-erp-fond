@@ -3,7 +3,9 @@ import Selector from "@/views/inventory/transaction/component/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { getTransactionList } from "@/api/inventory/transaction.ts";
+import { ElMessage } from 'element-plus'
+import { exportTransaction, getTransactionList, importTransaction } from "@/api/inventory/transaction.ts";
+import DetailDialog from "@/views/inventory/transaction/components/detailDialog.vue";
 import type { TransactionListRequest, TransactionListResponse } from "@/types/inventory/transaction.ts";
 import { formatDate, formatDecimal } from "@/composables/useFormat.ts";
 
@@ -18,6 +20,9 @@ const queryData = reactive<TransactionListRequest>({
 })
 
 const tableData = ref<TransactionListResponse>()
+const detailVisible = ref(false)
+const detailRow = ref<TransactionListResponse['records'][number] | null>(null)
+const fileInput = ref<HTMLInputElement>()
 
 const loadData = async () => {
   tableData.value = await getTransactionList(queryData)
@@ -57,6 +62,52 @@ onMounted(() => {
 const handleRefresh = () => {
   loadData()
 }
+
+const handleImport = () => {
+  fileInput.value?.click()
+}
+
+const handleFileChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  if (!file.name.toLowerCase().endsWith('.xlsx')) {
+    ElMessage.warning('仅支持导入 .xlsx 文件')
+    input.value = ''
+    return
+  }
+  try {
+    await importTransaction(file)
+    ElMessage.success('库存流水导入成功')
+    await loadData()
+  } catch {
+    ElMessage.error('库存流水导入失败，请检查文件内容')
+  } finally {
+    input.value = ''
+  }
+}
+
+const handleExport = async () => {
+  try {
+    const blob = await exportTransaction()
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = '库存流水.xlsx'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+    ElMessage.success('库存流水导出成功')
+  } catch {
+    ElMessage.error('库存流水导出失败')
+  }
+}
+
+const handleRowDblclick = (row: TransactionListResponse['records'][number]) => {
+  detailRow.value = row
+  detailVisible.value = true
+}
 </script>
 
 <template>
@@ -65,14 +116,16 @@ const handleRefresh = () => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
     <div class="toolbar round">
-      <ProToolbar :show-add="false" :show-edit="false" :show-delete="false" :show-export="false"
-        @refresh="handleRefresh" />
+      <ProToolbar :show-add="false" :show-edit="false" :show-delete="false" show-import
+        @import="handleImport" @export="handleExport" @refresh="handleRefresh" />
+      <input ref="fileInput" class="file-input" type="file" accept=".xlsx" @change="handleFileChange" />
     </div>
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.pageNum" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }">
+        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
+        @rowDblclick="handleRowDblclick">
         <template #quantity="{ row }">
           <span :class="row.quantity && row.quantity > 0 ? 'qty-in' : 'qty-out'">
             {{ formatDecimal.default(row.quantity, 0) }}
@@ -90,6 +143,7 @@ const handleRefresh = () => {
       </ProTable>
     </div>
   </div>
+  <DetailDialog :visible="detailVisible" :row="detailRow" @cancel="detailVisible = false" />
 </template>
 
 <style scoped>
@@ -123,5 +177,9 @@ const handleRefresh = () => {
 
 .transaction-container .qty-out {
   color: #f56c6c;
+}
+
+.transaction-container .file-input {
+  display: none;
 }
 </style>

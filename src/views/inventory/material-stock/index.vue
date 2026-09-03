@@ -5,7 +5,8 @@ import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
 import { createMaterialStock, getMaterialStockList } from "@/api/inventory/materialStock.ts";
 import type { MaterialStockCreateRequest, MaterialStockListRequest, MaterialStockListResponse } from "@/types/inventory/materialStock.ts";
-import SaveDialog from "@/views/inventory/material-stock/saveDialog.vue";
+import SaveDialog from "@/views/inventory/material-stock/components/saveDialog.vue";
+import DetailDialog from "@/views/inventory/material-stock/components/detailDialog.vue";
 import { ElMessage } from "element-plus";
 
 // 注意：库存接口分页参数是 pageNum
@@ -18,6 +19,8 @@ const queryData = reactive<MaterialStockListRequest>({
 
 const tableData = ref<MaterialStockListResponse>()
 const visible = ref(false)
+const detailVisible = ref(false)
+const detailRow = ref<MaterialStockListResponse['records'][number] | null>(null)
 
 const loadData = async () => {
   tableData.value = await getMaterialStockList(queryData)
@@ -56,6 +59,11 @@ const handleRefresh = () => {
   loadData()
 }
 
+const handleRowDblclick = (row: MaterialStockListResponse['records'][number]) => {
+  detailRow.value = row
+  detailVisible.value = true
+}
+
 const handleSubmit = async (form: MaterialStockCreateRequest) => {
   try {
     await createMaterialStock(form as MaterialStockCreateRequest)
@@ -85,7 +93,8 @@ const handleCancel = () => {
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.pageNum" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }">
+        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
+        @rowDblclick="handleRowDblclick">
         <template #onHand="{ row }">
           <span>{{ row.onHand ?? 0 }}</span>
         </template>
@@ -100,6 +109,7 @@ const handleCancel = () => {
   </div>
 
   <SaveDialog :visible="visible" title="新增物料库存" @cancel="handleCancel" @submit="handleSubmit" />
+  <DetailDialog :visible="detailVisible" :row="detailRow" @cancel="detailVisible = false" />
 </template>
 
 <style scoped>

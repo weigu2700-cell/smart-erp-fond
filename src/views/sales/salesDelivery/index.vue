@@ -99,6 +99,11 @@ const handleRefresh = () => {
   loadData()
 }
 
+const handleRowDblclick = (row: SalesDeliveryVo) => {
+  currentDetailId.value = String(row.id)
+  detailVisible.value = true
+}
+
 const handleSubmit = async (data: PostSaleDelivery) => {
   try {
     await postSalesDelivery(data)
@@ -133,7 +138,7 @@ onMounted(() => {
         :page="queryData.pageNum" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
-        @selectionChange="handleSelectionChange">
+        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
       </ProTable>
     </section>
   </div>

@@ -11,7 +11,8 @@ import type {
   WarehouseUpdateRequest,
   WarehouseVO
 } from "@/types/master/warehouse.ts";
-import SaveDialog from "@/views/master/warehouse/saveDialog.vue";
+import SaveDialog from "@/views/master/warehouse/components/saveDialog.vue";
+import DetailDialog from "@/views/master/warehouse/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 
 const queryData = reactive<WarehouseListRequest>({
@@ -26,9 +27,13 @@ const queryData = reactive<WarehouseListRequest>({
 
 const tableData = ref<WarehouseListResponse>()
 const visible = ref(false)
+const detailVisible = ref(false)
 const model = ref<'add' | 'edit'>('add')
 const selectedRowId = ref<string>()
 const tableRef = ref<{ clearSelection: () => void }>()
+
+// 兼容旧后端返回的枚举名称和新接口返回的状态码，避免启用仓库被误显示为停用。
+const isEnabledStatus = (status: unknown) => status === 1 || status === '1' || status === 'ENABLE'
 
 const handleSelectionChange = (rows: WarehouseVO[]) => {
   selectedRowId.value = rows[0] ? String(rows[0].id) : undefined
@@ -90,16 +95,18 @@ const handleEdit = () => {
   visible.value = true
 }
 
-const handleDelete = async () => {
+const handleStatus = async () => {
   const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
   if (!row) {
-    ElMessage.warning('请选择要删除的仓库')
+    ElMessage.warning('请选择要切换状态的仓库')
     return
   }
+  const target = isEnabledStatus(row.status) ? 'DISABLE' : 'ENABLE'
+  const action = target === 'ENABLE' ? '启用' : '停用'
   try {
     await ElMessageBox.confirm(
-      `确定要删除仓库 ${row.name} 吗？`,
-      '删除确认',
+      `确定要${action}仓库 ${row.name} 吗？`,
+      '状态确认',
       {
         type: 'warning',
         confirmButtonText: '确定',
@@ -110,18 +117,23 @@ const handleDelete = async () => {
     return // 用户取消
   }
   try {
-    await changeWarehouseStatus(String(row.id), 'DISABLE')
-    ElMessage.success('删除成功')
+    await changeWarehouseStatus(String(row.id), target)
+    ElMessage.success(`${action}成功`)
     tableRef.value?.clearSelection()
     selectedRowId.value = undefined
     await loadData()
   } catch {
-    ElMessage.error('删除失败')
+    ElMessage.error(`${action}失败`)
   }
 }
 
 const handleRefresh = () => {
   loadData()
+}
+
+const handleRowDblclick = (row: WarehouseVO) => {
+  detailVisible.value = true
+  selectedRowId.value = String(row.id)
 }
 
 const handleSubmit = async (form: WarehouseCreateRequest | WarehouseUpdateRequest) => {
@@ -152,20 +164,20 @@ const handleCancel = () => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
     <div class="toolbar round">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange">
+        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
         <template #type="{ row }">
           {{ typeLabel[row.type] ?? row.type }}
         </template>
         <template #status="{ row }">
-          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-            {{ row.status === 1 ? '启用' : '停用' }}
+          <el-tag :type="isEnabledStatus(row.status) ? 'success' : 'info'" size="small">
+            {{ isEnabledStatus(row.status) ? '启用' : '停用' }}
           </el-tag>
         </template>
       </ProTable>
@@ -175,6 +187,9 @@ const handleCancel = () => {
   <SaveDialog :visible="visible" :title="model === 'add' ? '新增仓库' : '修改仓库'" :mode="model"
     :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
     @submit="handleSubmit" />
+  <DetailDialog :visible="detailVisible"
+    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false" />
 </template>
 
 <style scoped>

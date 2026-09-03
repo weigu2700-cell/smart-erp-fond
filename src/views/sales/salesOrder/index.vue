@@ -6,6 +6,7 @@ import type { PageSalesOrder, SalesOrderVo, GetPageSalesOrderQuery, PostOrPutSal
 import ProToolbar from '@/components/ProToolbar.vue';
 import Selector from './components/selector.vue'
 import SaveDialog from './components/saveDialog.vue'
+import DetailDialog from './components/detailDialog.vue'
 import { ElMessage } from 'element-plus';
 
 const queryData = reactive<GetPageSalesOrderQuery>({
@@ -20,6 +21,8 @@ const tableData = ref<PageSalesOrder>();
 const tableRef = ref<{ clearSelection: () => void }>();
 const selectedRowId = ref<string>();
 const visible = ref<boolean>(false)
+const detailVisible = ref<boolean>(false)
+const currentDetailId = ref<string>()
 const model = ref<'add' | 'edit'>('add')
 
 const handleSelectionChange = (rows: SalesOrderVo[]) => {
@@ -86,6 +89,11 @@ const handleRefresh = () => {
   loadData()
 }
 
+const handleRowDblclick = (row: SalesOrderVo) => {
+  currentDetailId.value = String(row.id)
+  detailVisible.value = true
+}
+
 const handleSubmit = async (data: PostOrPutSalesOrder) => {
   try {
     if (model.value === 'edit') {
@@ -125,13 +133,14 @@ onMounted(() => {
         :page="queryData.pageNum" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
-        @selectionChange="handleSelectionChange">
+        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
       </ProTable>
     </section>
   </div>
   <SaveDialog :visible="visible" :mode="model"
     :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
     @submit="handleSubmit" />
+  <DetailDialog :visible="detailVisible" :order-id="currentDetailId" @cancel="detailVisible = false" />
 </template>
 
 <style scoped lang="scss">

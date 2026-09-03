@@ -93,8 +93,8 @@ const appStore = useAppStore()
   bottom: 0;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #4285f4 0 25%, #34a853 25% 50%, #fbbc04 50% 75%, #ea4335 75%);
-  opacity: .6;
+  background: var(--color-primary);
+  opacity: .72;
 }
 
 .brand--collapsed {

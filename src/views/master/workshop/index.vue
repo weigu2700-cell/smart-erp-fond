@@ -12,7 +12,8 @@ import type {
   WorkshopVO
 } from "@/types/master/workshop.ts";
 import { ElMessage, ElMessageBox } from "element-plus";
-import SaveDialog from "@/views/master/workshop/saveDialog.vue";
+import SaveDialog from "@/views/master/workshop/components/saveDialog.vue";
+import DetailDialog from "@/views/master/workshop/components/detailDialog.vue";
 
 const queryData = reactive<WorkshopListRequest>({
   page: 1,
@@ -25,6 +26,7 @@ const queryData = reactive<WorkshopListRequest>({
 
 const tableData = ref<WorkshopListResponse>()
 const visible = ref(false)
+const detailVisible = ref(false)
 const model = ref<'add' | 'edit'>('add')
 const selectedRowId = ref<string>('')
 const tableRef = ref<{ clearSelection: () => void }>()
@@ -83,14 +85,18 @@ const handleEdit = () => {
   visible.value = true
 }
 
-const handleDelete = async () => {
+const handleStatus = async () => {
   const rowId = selectedRowId.value
   if (!rowId) {
-    ElMessage.warning('请选择要删除的车间')
+    ElMessage.warning('请选择要切换状态的车间')
     return
   }
+  const row = tableData.value?.records?.find(item => String(item.id) === String(rowId))
+  if (!row) return
+  const target = row.status === 1 ? 'DISABLE' : 'ENABLE'
+  const action = target === 'ENABLE' ? '启用' : '停用'
   try {
-    await ElMessageBox.confirm('确定要删除选中的车间吗？', '提示', {
+    await ElMessageBox.confirm(`确定要${action}选中的车间吗？`, '状态确认', {
       type: 'warning',
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -99,18 +105,23 @@ const handleDelete = async () => {
     return // 用户取消
   }
   try {
-    await changeWorkshopStatus(String(rowId), 'DISABLE')
-    ElMessage.success('删除成功')
+    await changeWorkshopStatus(String(rowId), target)
+    ElMessage.success(`${action}成功`)
     tableRef.value?.clearSelection()
     selectedRowId.value = ''
     await loadData()
   } catch {
-    ElMessage.error('删除失败')
+    ElMessage.error(`${action}失败`)
   }
 }
 
 const handleRefresh = () => {
   loadData()
+}
+
+const handleRowDblclick = (row: WorkshopVO) => {
+  detailVisible.value = true
+  selectedRowId.value = String(row.id)
 }
 
 const handleSubmit = async (form: WorkshopCreateRequest | WorkshopUpdateRequest) => {
@@ -146,14 +157,14 @@ onMounted(() => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset"></Selector>
     </div>
     <div class="toolbar round">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange">
+        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
         <template #status="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'">
             {{ row.status === 1 ? '启用' : '停用' }}
@@ -165,6 +176,9 @@ onMounted(() => {
 
   <SaveDialog v-model="visible" :model="model" :selectedRowId="selectedRowId" @submit="handleSubmit"
     @cancel="handleCancel" />
+  <DetailDialog :visible="detailVisible"
+    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false" />
 </template>
 
 <style scoped>

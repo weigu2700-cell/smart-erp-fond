@@ -20,7 +20,7 @@
   --menu-hover: #30455f;
   --menu-active: #1a73e8;
   --menu-hover-bg: rgb(26 115 232 / 10%);
-  --menu-active-bg: rgb(26 115 232 / 16%);
+  --menu-active-bg: rgb(26 115 232 / 22%);
   --menu-sub: #1d2a3a;
   --menu-brand-text: #ffffff;
   --menu-brand-muted: #a8b3c4;
@@ -52,7 +52,7 @@ html.dark {
   --menu-hover: #1f2937;
   --menu-active: #174ea6;
   --menu-hover-bg: rgb(26 115 232 / 12%);
-  --menu-active-bg: rgb(26 115 232 / 20%);
+  --menu-active-bg: rgb(26 115 232 / 24%);
   --menu-sub: #0f172a;
   --menu-brand-text: #f8fafc;
   --menu-brand-muted: #94a3b8;

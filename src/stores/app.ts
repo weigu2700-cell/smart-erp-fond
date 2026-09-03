@@ -23,19 +23,6 @@ const colorSchemes: Record<ColorScheme, {
   orange: { name: '活力橙', primary: '#c2410c', hover: '#9a3412', light3: '#df8a66', light5: '#ebb19a', light7: '#f3cfc0', light8: '#f7ddd2', light9: '#fdf1ed', dark: '#9a3412' },
 }
 
-function mixHex(foreground: string, background: string, foregroundWeight: number) {
-  const parse = (value: string) => value.replace('#', '').match(/.{2}/g)?.map(part => parseInt(part, 16)) ?? [0, 0, 0]
-  const fg = parse(foreground)
-  const bg = parse(background)
-  const channels = fg.map((channel, index) => Math.round(channel * foregroundWeight + bg[index]! * (1 - foregroundWeight)))
-  return `#${channels.map(channel => channel.toString(16).padStart(2, '0')).join('')}`
-}
-
-function rgbaHex(value: string, alpha: number) {
-  const channels = value.replace('#', '').match(/.{2}/g)?.map(part => parseInt(part, 16)) ?? [0, 0, 0]
-  return `rgb(${channels.join(' ')} / ${alpha})`
-}
-
 function applyTheme(mode: ThemeMode, scheme: ColorScheme) {
   if (typeof document === 'undefined') return
   const root = document.documentElement
@@ -51,15 +38,16 @@ function applyTheme(mode: ThemeMode, scheme: ColorScheme) {
   root.style.setProperty('--el-color-primary-light-8', palette.light8)
   root.style.setProperty('--el-color-primary-light-9', palette.light9)
   root.style.setProperty('--el-color-primary-dark-2', palette.dark)
-  const menuSurface = mode === 'dark' ? mixHex(palette.primary, '#0f172a', 0.18) : mixHex(palette.primary, '#1f2937', 0.2)
-  const menuHover = mode === 'dark' ? mixHex(palette.primary, '#1f2937', 0.24) : mixHex(palette.primary, '#334155', 0.28)
-  const menuSub = mode === 'dark' ? mixHex(palette.primary, '#020617', 0.1) : mixHex(palette.primary, '#111827', 0.12)
+  // 侧栏保持中性深色，只让选中条使用主题色，避免整块菜单被染成高饱和色。
+  const menuSurface = mode === 'dark' ? '#111827' : '#1f2937'
+  const menuHover = mode === 'dark' ? '#1f2937' : '#334155'
+  const menuSub = 'transparent'
   root.style.setProperty('--menu-surface', menuSurface)
   root.style.setProperty('--menu-text', mode === 'dark' ? '#cbd5e1' : '#d8e0ea')
   root.style.setProperty('--menu-hover', menuHover)
   root.style.setProperty('--menu-active', mode === 'dark' ? palette.dark : palette.primary)
-  root.style.setProperty('--menu-hover-bg', rgbaHex(palette.primary, mode === 'dark' ? 0.12 : 0.1))
-  root.style.setProperty('--menu-active-bg', rgbaHex(palette.primary, mode === 'dark' ? 0.2 : 0.16))
+  root.style.setProperty('--menu-hover-bg', mode === 'dark' ? 'rgb(255 255 255 / 6%)' : 'rgb(255 255 255 / 8%)')
+  root.style.setProperty('--menu-active-bg', mode === 'dark' ? 'rgb(255 255 255 / 12%)' : 'rgb(255 255 255 / 14%)')
   root.style.setProperty('--menu-sub', menuSub)
   root.style.setProperty('--menu-brand-text', mode === 'dark' ? '#f8fafc' : '#ffffff')
   root.style.setProperty('--menu-brand-muted', mode === 'dark' ? '#94a3b8' : '#a8b3c4')
