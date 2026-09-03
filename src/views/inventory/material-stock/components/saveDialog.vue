@@ -39,15 +39,6 @@
     }
   )
 
-  // el-dialog 需要 v-model，但 visible 是只读 prop，用内部 ref 桥接
-  const dialogVisible = ref(props.visible)
-  watch(() => props.visible, (v) => {
-    dialogVisible.value = v
-  })
-  watch(dialogVisible, (v) => {
-    if (!v) emit('cancel')
-  })
-
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate().catch(() => false)
     if (!valid) {

@@ -46,17 +46,6 @@ const rules: FormRules = {
   factoryId: [{ required: true, message: '请选择所属工厂', trigger: 'change' }],
 }
 
-// el-dialog 需要 v-model，但 modelValue 是只读 prop，用内部 ref 桥接
-const dialogVisible = ref(props.modelValue)
-watch(() => props.modelValue, (v) => {
-  dialogVisible.value = v
-})
-watch(dialogVisible, (v) => {
-  // 同步回父组件，保证 v-model 语义完整（点 X / 遮罩关闭也能同步）
-  emit('update:modelValue', v)
-  if (!v) emit('cancel')
-})
-
 watch(() => props.modelValue, async (val) => {
   if (!val) return
   formRef.value?.clearValidate()
