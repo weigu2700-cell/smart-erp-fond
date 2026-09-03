@@ -100,7 +100,7 @@ const handleDelete = async () => {
     return // 用户取消
   }
   try {
-    await changeFactoryStatus({ id: row.id, status: 0 })
+    await changeFactoryStatus({ id: row.id, status: 'DISABLE' })
     ElMessage.success('删除成功')
     tableRef.value?.clearSelection()
     selectedRowId.value = undefined

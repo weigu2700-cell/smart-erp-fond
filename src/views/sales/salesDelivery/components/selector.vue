@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import ProSearch from '@/components/ProSearch.vue';
 import CustomerRefer from '@/selector/CustomerRefer.vue';
-import type { GetPageSalesOrderQuery } from '@/types/sales/salesOrder';
+import type { GetPageSalesDelivery } from '@/types/sales/salesDelivery';
 
 const props = defineProps<{
-  queryData: GetPageSalesOrderQuery
+  queryData: GetPageSalesDelivery
 }>()
 
 const emit = defineEmits<{
-  (e: 'query', params: GetPageSalesOrderQuery): void
+  (e: 'query', params: GetPageSalesDelivery): void
   (e: 'reset'): void
 }>()
 
@@ -21,17 +21,17 @@ const handleReset = () => {
 }
 
 const statusOptions = [
-  { label: '草稿', value: 0 },
-  { label: '已确认', value: 1 },
-  { label: '已完成', value: 2 },
-  { label: '已取消', value: 3 }
+  { label: '草稿', value: 'DRAFT' },
+  { label: '已确认', value: 'CONFIRMED' },
+  { label: '已完成', value: 'COMPLETED' },
+  { label: '已取消', value: 'CANCELLED' }
 ]
 </script>
 
 <template>
   <ProSearch @search="handleQuery" @reset="handleReset">
     <div class="search-container">
-      <el-input v-model="props.queryData.orderNo" placeholder="请输入订单号" clearable />
+      <el-input v-model="props.queryData.deliveryNo" placeholder="请输入交货单号" clearable />
       <CustomerRefer class="customer" v-model="props.queryData.customerId" />
       <el-select v-model="props.queryData.status" placeholder="请选择状态" clearable>
         <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />

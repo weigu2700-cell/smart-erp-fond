@@ -38,3 +38,9 @@ export function cancelSalesDelivery (id:string) {
     `sales/delivery/${id}/cancel`
   )
 }
+
+export function removeSalesDelivery (id:string) {
+  return service.del<void>(
+    `sales/delivery/${id}`
+  )
+}

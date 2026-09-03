@@ -34,5 +34,5 @@ export interface addOrUpdateFactoryRequest {
 
 export interface changeFactoryStatusRequest {
   id: string
-  status: number
+  status: FactoryStatus
 }

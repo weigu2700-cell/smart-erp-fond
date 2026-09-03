@@ -23,5 +23,5 @@ export function updateFactory(id: string,data: addOrUpdateFactoryRequest) {
 }
 
 export function changeFactoryStatus(data: changeFactoryStatusRequest) {
-  return service.put<void>(`master/factory/${data.id}/status`, data)
+  return service.put<void>(`master/factory/${data.id}/status`, null, {params: {status: data.status}})
 }

@@ -13,7 +13,7 @@ const queryData = reactive<GetPageSalesOrderQuery>({
   pageSize: 10,
   orderNo: '',
   customerId: '',
-  status: 0
+  status: null
 });
 
 const tableData = ref<PageSalesOrder>();
@@ -48,7 +48,7 @@ const handleQuery = () => {
 const handleReset = () => {
   queryData.orderNo = '';
   queryData.customerId = '';
-  queryData.status = 0;
+  queryData.status = null;
   queryData.pageNum = 1;
   loadData();
 }

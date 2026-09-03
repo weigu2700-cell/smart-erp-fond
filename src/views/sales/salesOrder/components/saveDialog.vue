@@ -110,7 +110,7 @@ const handleCancel = () => {
 
 <template>
   <el-dialog :model-value="props.visible" :title="props.title ?? (props.mode === 'edit' ? '修改销售订单' : '新增销售订单')"
-    width="900px" @close="handleCancel">
+    width="1000px" @close="handleCancel">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-row :gutter="20">
         <el-col :span="8">
@@ -120,14 +120,14 @@ const handleCancel = () => {
         </el-col>
         <el-col :span="8">
           <el-form-item label="订单日期" prop="orderDate">
-            <el-date-picker v-model="form.orderDate" type="date" placeholder="请选择订单日期" format="YYYY-MM-DD"
-              value-format="YYYY-MM-DD" style="width: 100%" />
+            <el-date-picker v-model="form.orderDate" type="datetime" placeholder="请选择订单日期" format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DDTHH:mm:ss" style="width: 100%" />
           </el-form-item>
         </el-col>
         <el-col :span="8">
           <el-form-item label="交货日期" prop="deliveryDate">
-            <el-date-picker v-model="form.deliveryDate" type="date" placeholder="请选择交货日期" format="YYYY-MM-DD"
-              value-format="YYYY-MM-DD" style="width: 100%" />
+            <el-date-picker v-model="form.deliveryDate" type="datetime" placeholder="请选择交货日期"
+              format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ss" style="width: 100%" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -138,34 +138,33 @@ const handleCancel = () => {
       <el-divider>订单明细</el-divider>
 
       <el-button type="primary" size="small" @click="addItem">添加明细</el-button>
-
       <el-table :data="form.items" border style="margin-top: 10px">
         <el-table-column label="行号" width="60" align="center">
           <template #default="{ $index }">
             {{ $index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column label="物料" min-width="180">
+        <el-table-column label="物料" min-width="140">
           <template #default="{ row, $index }">
             <MaterialRefer v-model="row.materialId" @update:model-value="(v) => handleMaterialChange($index, v)" />
           </template>
         </el-table-column>
-        <el-table-column label="仓库" min-width="150">
+        <el-table-column label="仓库" min-width="140">
           <template #default="{ row, $index }">
             <WarehouseRefer v-model="row.warehouseId" @update:model-value="(v) => handleWarehouseChange($index, v)" />
           </template>
         </el-table-column>
-        <el-table-column label="数量" width="100">
+        <el-table-column label="数量" width="140">
           <template #default="{ row }">
             <el-input-number v-model="row.quantity" :min="0" :precision="0" size="small" style="width: 100%" />
           </template>
         </el-table-column>
-        <el-table-column label="单价" width="100">
+        <el-table-column label="单价" width="140">
           <template #default="{ row }">
             <el-input-number v-model="row.unitPrice" :min="0" :precision="2" size="small" style="width: 100%" />
           </template>
         </el-table-column>
-        <el-table-column label="金额" width="100" align="right">
+        <el-table-column label="金额" width="140" align="right">
           <template #default="{ row }">
             {{ calculateAmount(row).toFixed(2) }}
           </template>

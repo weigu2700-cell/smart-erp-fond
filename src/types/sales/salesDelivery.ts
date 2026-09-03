@@ -32,8 +32,8 @@ export interface GetPageSalesDelivery {
   pageNum: number;
   pageSize: number;
   deliveryNo: string;
-  salesOrderId: number;
-  customerId: number;
+  salesOrderId: number | null;
+  customerId: number | null;
   status: string;
 }
 

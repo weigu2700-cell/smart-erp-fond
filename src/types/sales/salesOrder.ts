@@ -49,5 +49,5 @@ export interface GetPageSalesOrderQuery {
   pageSize: number;
   orderNo: string;
   customerId: string;
-  status: number;
+  status: number | null;
 }
