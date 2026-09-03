@@ -1,0 +1,40 @@
+import service from '@/utils/request'
+import type {
+  PageSalesDelivery,
+  GetPageSalesDelivery,
+  SalesDeliveryVo,
+  PostSaleDelivery
+} from '@/types/sales/salesDelivery'
+
+
+export function getLPageSalesDelivery (data:GetPageSalesDelivery) {
+  return service.get<PageSalesDelivery>(
+    'sales/delivery',
+    {params:data}
+  )
+}
+
+export function getSalesDeliveryDetail (id:string) {
+  return service.get<SalesDeliveryVo>(
+    `sales/delivery/${id}`
+  )
+}
+
+export function postSalesDelivery (data:PostSaleDelivery) {
+  return service.post<SalesDeliveryVo>(
+    'sales/delivery',
+    data
+  )
+}
+
+export function confirmSalesDelivery (id:string) {
+  return service.put<SalesDeliveryVo>(
+    `sales/delivery/${id}/confirm`
+  )
+}
+
+export function cancelSalesDelivery (id:string) {
+  return service.put<SalesDeliveryVo>(
+    `sales/delivery/${id}/cancel`
+  )
+}

@@ -1,0 +1,150 @@
+<script setup lang="ts">
+import ProTable, { type ProColumn } from '@/components/ProTable.vue';
+import { onMounted, ref, reactive } from 'vue';
+import { getPageSalesOrder, postSalesOrder, changeSalesorder, removeSalesOrder } from '@/api/sales/salesOrder';
+import type { PageSalesOrder, SalesOrderVo, GetPageSalesOrderQuery, PostOrPutSalesOrder } from '@/types/sales/salesOrder';
+import ProToolbar from '@/components/ProToolbar.vue';
+import Selector from './components/selector.vue'
+import SaveDialog from './components/saveDialog.vue'
+import { ElMessage } from 'element-plus';
+
+const queryData = reactive<GetPageSalesOrderQuery>({
+  pageNum: 1,
+  pageSize: 10,
+  orderNo: '',
+  customerId: '',
+  status: 0
+});
+
+const tableData = ref<PageSalesOrder>();
+const tableRef = ref<{ clearSelection: () => void }>();
+const selectedRowId = ref<string>();
+const visible = ref<boolean>(false)
+const model = ref<'add' | 'edit'>('add')
+
+const handleSelectionChange = (rows: SalesOrderVo[]) => {
+  selectedRowId.value = rows[0] ? String(rows[0].id) : undefined;
+};
+
+const loadData = async () => {
+  tableData.value = await getPageSalesOrder(queryData);
+};
+
+const columns = ref<ProColumn[]>([
+  { label: '订单号', prop: 'orderNo', width: 200 },
+  { label: '客户名称', prop: 'customerName', width: 200 },
+  { label: '订单日期', prop: 'orderDate', width: 150 },
+  { label: '交货日期', prop: 'deliveryDate', width: 150 },
+  { label: '总金额', prop: 'totalAmount', width: 120 },
+  { label: '状态', prop: 'status', width: 100 },
+  { label: '备注', prop: 'remark', minWidth: 150 }
+]);
+
+const handleQuery = () => {
+  queryData.pageNum = 1;
+  loadData();
+}
+
+const handleReset = () => {
+  queryData.orderNo = '';
+  queryData.customerId = '';
+  queryData.status = 0;
+  queryData.pageNum = 1;
+  loadData();
+}
+
+const handleAdd = () => {
+  visible.value = true
+  model.value = 'add'
+}
+
+const handleEdit = () => {
+  if (!selectedRowId.value) {
+    ElMessage.warning('请选择一条数据进行编辑')
+    return
+  }
+  visible.value = true
+  model.value = 'edit'
+}
+
+const handleDelete = async () => {
+  if (!selectedRowId.value) {
+    ElMessage.warning('请选择一条数据进行删除')
+    return
+  }
+
+  try {
+    await removeSalesOrder(selectedRowId.value)
+    ElMessage.success('删除成功')
+    loadData()
+  } catch {
+    ElMessage.error('删除失败')
+  }
+}
+
+const handleRefresh = () => {
+  loadData()
+}
+
+const handleSubmit = async (data: PostOrPutSalesOrder) => {
+  try {
+    if (model.value === 'edit') {
+      await changeSalesorder(selectedRowId.value!, data)
+      ElMessage.success('修改成功')
+    } else {
+      await postSalesOrder(data)
+      ElMessage.success('新增成功')
+    }
+    visible.value = false
+    loadData()
+  } catch {
+    ElMessage.error('保存失败')
+  }
+}
+
+const handleCancel = () => {
+  visible.value = false
+}
+
+onMounted(() => {
+  loadData();
+});
+
+</script>
+
+<template>
+  <div class="container">
+    <section class="selector">
+      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+    </section>
+    <section class="toolbar">
+      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+    </section>
+    <section class="table">
+      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
+        :page="queryData.pageNum" :page-size="queryData.pageSize"
+        @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
+        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
+        @selectionChange="handleSelectionChange">
+      </ProTable>
+    </section>
+  </div>
+  <SaveDialog :visible="visible" :mode="model"
+    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
+    @submit="handleSubmit" />
+</template>
+
+<style scoped lang="scss">
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+
+  .table {
+    flex: 1;
+    overflow: auto;
+  }
+}
+</style>
