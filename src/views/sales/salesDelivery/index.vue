@@ -26,6 +26,13 @@ const detailVisible = ref<boolean>(false)
 const model = ref<'add' | 'edit'>('add')
 const currentDetailId = ref<string>()
 
+const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
+  DRAFT: { label: '草稿', type: 'info' },
+  CONFIRMED: { label: '已确认', type: 'success' },
+  COMPLETED: { label: '已完成', type: 'warning' },
+  CANCELLED: { label: '已取消', type: 'danger' }
+}
+
 const handleSelectionChange = (rows: SalesDeliveryVo[]) => {
   selectedRowId.value = rows[0] ? String(rows[0].id) : undefined;
 };
@@ -38,8 +45,8 @@ const columns = ref<ProColumn[]>([
   { label: '交货单号', prop: 'deliveryNo', width: 200 },
   { label: '销售订单号', prop: 'salesOrderNo', width: 200 },
   { label: '客户名称', prop: 'customerName', width: 200 },
-  { label: '交货日期', prop: 'deliveryDate', width: 150 },
-  { label: '状态', prop: 'status', width: 100 },
+  { label: '交货日期', prop: 'deliveryDate', width: 200 },
+  { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '备注', prop: 'remark', minWidth: 150 }
 ]);
 
@@ -139,6 +146,11 @@ onMounted(() => {
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
         @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+        <template #status="{ row }">
+          <el-tag :type="statusMap[row.status]?.type ?? 'info'">
+            {{ statusMap[row.status]?.label ?? '未知' }}
+          </el-tag>
+        </template>
       </ProTable>
     </section>
   </div>
