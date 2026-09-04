@@ -2,7 +2,7 @@
 import { reactive, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
-import FactoryRefer from "@/selector/FactoryRefer.vue";
+import FactoryRefer from "@/refer/FactoryRefer.vue";
 import { getWorkshopDetail } from "@/api/master/workshop.ts";
 import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 import type {

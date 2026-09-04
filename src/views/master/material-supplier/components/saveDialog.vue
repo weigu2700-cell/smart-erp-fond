@@ -2,8 +2,8 @@
 import { reactive, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
-import MaterialRefer from "@/selector/MaterialRefer.vue";
-import SupplierRefer from "@/selector/SupplierRefer.vue";
+import MaterialRefer from "@/refer/MaterialRefer.vue";
+import SupplierRefer from "@/refer/SupplierRefer.vue";
 import type { MaterialSupplierCreateRequest, MaterialSupplierUpdateRequest, MaterialSupplierVO } from "@/types/master/materialSupplier.ts";
 import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 

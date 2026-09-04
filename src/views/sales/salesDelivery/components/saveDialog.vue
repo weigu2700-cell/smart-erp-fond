@@ -3,9 +3,9 @@ import { reactive, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
 import type { PostSaleDelivery, PostSaleDeliveryItem } from '@/types/sales/salesDelivery';
-import SalesOrderRefer from '@/selector/SalesOrderRefer.vue';
-import WarehouseRefer from '@/selector/WarehouseRefer.vue';
-import MaterialRefer from '@/selector/MaterialRefer.vue';
+import SalesOrderRefer from '@/refer/SalesOrderRefer.vue';
+import WarehouseRefer from '@/refer/WarehouseRefer.vue';
+import MaterialRefer from '@/refer/MaterialRefer.vue';
 import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
 
 const props = defineProps<{
@@ -72,7 +72,8 @@ watch(() => props.visible, (val) => {
 </script>
 
 <template>
-  <BaseSaveDialog :visible="props.visible" :title="props.title ?? '新增销售交货单'" width="900px" @cancel="handleCancel" @submit="handleSubmit">
+  <BaseSaveDialog :visible="props.visible" :title="props.title ?? '新增销售交货单'" width="900px" @cancel="handleCancel"
+    @submit="handleSubmit">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-row :gutter="20">
         <el-col :span="12">

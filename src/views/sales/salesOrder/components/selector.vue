@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ProSearch from '@/components/ProSearch.vue';
-import CustomerRefer from '@/selector/CustomerRefer.vue';
+import CustomerRefer from '@/refer/CustomerRefer.vue';
 import type { GetPageSalesOrderQuery } from '@/types/sales/salesOrder';
 
 const props = defineProps<{

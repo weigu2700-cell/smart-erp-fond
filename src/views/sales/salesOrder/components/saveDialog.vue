@@ -3,9 +3,9 @@ import { reactive, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
 import type { PostOrPutSalesOrder, PostOrPutSalesOrderItem, SalesOrderVo } from '@/types/sales/salesOrder';
-import CustomerRefer from '@/selector/CustomerRefer.vue';
-import MaterialRefer from '@/selector/MaterialRefer.vue';
-import WarehouseRefer from '@/selector/WarehouseRefer.vue';
+import CustomerRefer from '@/refer/CustomerRefer.vue';
+import MaterialRefer from '@/refer/MaterialRefer.vue';
+import WarehouseRefer from '@/refer/WarehouseRefer.vue';
 import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
 
 const props = defineProps<{
