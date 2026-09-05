@@ -43,7 +43,7 @@ const loadData = async () => {
 const columns = ref<ProColumn[]>([
   { label: '物料编码', prop: 'code', width: 240 },
   { label: '物料名称', prop: 'name', minWidth: 140 },
-  { label: '规格', prop: 'spec', width: 120 },
+  { label: '规格', prop: 'spec', width: 160 },
   { label: '类型', prop: 'type', width: 110, slot: 'type' },
   { label: '单位', prop: 'unit', width: 80 },
   { label: '安全库存', prop: 'safetyStock', width: 100 },
@@ -163,7 +163,8 @@ const handleCancel = () => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
     <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+        @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

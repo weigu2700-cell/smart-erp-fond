@@ -13,3 +13,8 @@ export interface PageResult<T> {
   /** 总页数（部分接口未返回，故为可选） */
   pages?: number
 }
+
+export interface statusType {
+  label: string;
+  value: string;
+}
