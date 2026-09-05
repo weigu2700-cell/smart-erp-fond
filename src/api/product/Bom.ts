@@ -1,4 +1,4 @@
-import type { BomVo, GetPageBomRequest, GetPageBomResponse } from "@/types/product/Bom";
+import type { BomVo, CreateBomRequest, GetPageBomRequest, GetPageBomResponse } from "@/types/product/Bom";
 import service from "@/utils/request";
 
 export function getPageBom (data:GetPageBomRequest) {
@@ -11,5 +11,12 @@ export function getPageBom (data:GetPageBomRequest) {
 export function getDetailBom (id:string) {
   return service.get<BomVo>(
     `/prd/bom/${id}`
+  )
+}
+
+export function createBom (data:CreateBomRequest) {
+  return service.post<void>(
+    '/prd/bom',
+    data
   )
 }

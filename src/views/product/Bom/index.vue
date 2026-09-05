@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import type { ProColumn } from '@/components/ProTable.vue';
 import ProTable from '@/components/ProTable.vue';
-import type { GetPageBomRequest, GetPageBomResponse } from '@/types/product/Bom';
+import type { CreateBomItemRequest, CreateBomRequest, GetPageBomRequest, GetPageBomResponse } from '@/types/product/Bom';
 import { onMounted, ref } from 'vue'
-import { getPageBom } from '../../../api/product/Bom';
+import { createBom, getDetailBom, getPageBom } from '../../../api/product/Bom';
 import Selector from './components/selector.vue';
 import ProToolbar from '@/components/ProToolbar.vue';
 import detailDialog from './components/detail.vue';
+import saveDialog from './components/save.vue'
 import type { BomVo } from '@/types/product/Bom';
 
 const SelectionId = ref<string>()
-const tableRef = ref()
+const tableRef = ref<Element>()
 const detailVisible = ref<boolean>(false)
+const saveVisible = ref<boolean>(false)
 const detailRow = ref<BomVo | null>(null)
+const model = ref<'add' | 'edit'>('add')
+
 const queryData = ref<GetPageBomRequest>({
   pageNum: 1,
   pageSize: 10,
@@ -30,9 +34,23 @@ const tableData = ref<GetPageBomResponse>({
   searchCount: ''
 })
 
+const tableDataDetail = ref<BomVo>({
+  id: '',
+  bomNo: '',
+  materialId: '',
+  materialCode: '',
+  materialName: '',
+  status: '',
+  version: 0,
+  remark: '',
+  createTime: '',
+  updateTime: '',
+  bomItems: []
+})
+
 const columns = ref<ProColumn[]>([
-  { label: 'BOM编号', prop: 'bomNo', width: 150 },
-  { label: '物料编码', prop: 'materialCode', width: 150 },
+  { label: 'BOM编号', prop: 'bomNo', width: 200 },
+  { label: '物料编码', prop: 'materialCode', width: 200 },
   { label: '物料名称', prop: 'materialName', minWidth: 200 },
   { label: '状态', prop: 'status', width: 100 },
   { label: '版本', prop: 'version', width: 80 },
@@ -59,9 +77,34 @@ const handleRowDblclick = (row: BomVo) => {
   detailVisible.value = true
 }
 
+const handleSubmit = async (submitData: CreateBomRequest) => {
+  if (model.value === 'add') {
+    try {
+      await createBom(submitData)
+      console.log('新增BOM数据提交', submitData)
+      saveVisible.value = false
+      loadData()
+    } catch (error) {
+      console.error('新增BOM失败', error)
+    }
+  } else if (model.value === 'edit') {
+    try {
+      await createBom(submitData)
+      console.log('修改BOM数据提交', submitData)
+      saveVisible.value = false
+      loadData()
+    } catch (error) {
+      console.error('修改BOM失败', error)
+    }
+  }
+}
+
 const handleCancel = () => {
   detailVisible.value = false
   detailRow.value = null
+  if (saveVisible.value != false) {
+    saveVisible.value = false
+  }
 }
 
 const handleQuery = () => {
@@ -80,11 +123,25 @@ const handleReset = () => {
 }
 
 const handleAdd = () => {
-  // TODO: 实现新增功能
+  model.value = 'add'
+  saveVisible.value = true
 }
 
-const handleEdit = () => {
+const saveRow = ref<BomVo | null>(null)
 
+const handleEdit = async () => {
+  if (!SelectionId.value) {
+    console.warn('请先选择一条记录进行编辑')
+    return
+  }
+  try {
+    const res = await getDetailBom(SelectionId.value)
+    saveRow.value = res
+    model.value = 'edit'
+    saveVisible.value = true
+  } catch (error) {
+    console.error('获取BOM详情失败', error)
+  }
 }
 
 const handleDelete = () => {
@@ -114,8 +171,8 @@ onMounted(() => {
         @refresh="handleRefresh" />
     </section>
     <section class="table">
-      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.pageNum" :page-size="queryData.pageSize"
+      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns"
+        :total="Number(tableData?.total ?? 0)" :page="Number(queryData.pageNum)" :page-size="Number(queryData.pageSize)"
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
         @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
@@ -123,6 +180,8 @@ onMounted(() => {
     </section>
   </div>
   <detailDialog :visible="detailVisible" :row="detailRow" @cancel="handleCancel" />
+  <saveDialog :visible="saveVisible" :title="model === 'add' ? '新增' : '修改'" :model="model" :row="saveRow"
+    @submit="handleSubmit" @cancel="handleCancel" />
 </template>
 
 <style scoped>
